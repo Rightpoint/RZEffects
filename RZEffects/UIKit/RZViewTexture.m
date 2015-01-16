@@ -34,7 +34,7 @@
 
 + (instancetype)textureWithSize:(CGSize)size scale:(CGFloat)scale
 {
-    return [[[self class] alloc] _initWithSize:size scale:scale];
+    return [[[self class] alloc] initWithSize:size scale:scale];
 }
 
 - (void)dealloc
@@ -45,11 +45,11 @@
 - (void)updateWithView:(UIView *)view synchronous:(BOOL)synchronous
 {
     if ( synchronous ) {
-        [self _renderView:view];
+        [self rz_renderView:view];
     }
     else if ( dispatch_semaphore_wait(_renderSemaphore, DISPATCH_TIME_NOW) == 0 ) {
         dispatch_async(_renderQueue, ^{
-            [self _renderView:view];
+            [self rz_renderView:view];
             
             dispatch_semaphore_signal(_renderSemaphore);
         });
@@ -117,7 +117,7 @@
 
 #pragma mark - private methods
 
-- (instancetype)_initWithSize:(CGSize)size scale:(CGFloat)scale
+- (instancetype)initWithSize:(CGSize)size scale:(CGFloat)scale
 {
     self = [super init];
     if ( self ) {
@@ -135,7 +135,7 @@
     return self;
 }
 
-- (void)_renderView:(UIView *)view
+- (void)rz_renderView:(UIView *)view
 {
     @autoreleasepool {
         CVPixelBufferLockBaseAddress(_pixBuffer, 0);

@@ -69,7 +69,7 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
 #endif
     
     if ( vsh != nil && fsh != nil ) {
-        effect = [[self alloc] _initWithVertexShader:vsh fragmentShader:fsh];
+        effect = [[self alloc] initWithVertexShader:vsh fragmentShader:fsh];
     }
     
     return effect;
@@ -194,7 +194,7 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
 
 #pragma mark - private methods
 
-- (instancetype)_initWithVertexShader:(NSString *)vsh fragmentShader:(NSString *)fsh
+- (instancetype)initWithVertexShader:(NSString *)vsh fragmentShader:(NSString *)fsh
 {
     self = [super init];
     if ( self ) {
