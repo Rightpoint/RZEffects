@@ -24,17 +24,17 @@
 
 + (instancetype)transformWithTranslation:(GLKVector3)trans rotation:(GLKQuaternion)rot scale:(GLKVector3)scale
 {
-    return [[[self class] alloc] _initWithTranslation:trans rotation:rot scale:scale];
+    return [[[self class] alloc] initWithTranslation:trans rotation:rot scale:scale];
 }
 
 - (instancetype)init
 {
-    return [self _initWithTranslation:GLKVector3Make(0.0f, 0.0f, 0.0f) rotation:GLKQuaternionIdentity scale:GLKVector3Make(1.0f, 1.0f, 1.0f)];
+    return [self initWithTranslation:GLKVector3Make(0.0f, 0.0f, 0.0f) rotation:GLKQuaternionIdentity scale:GLKVector3Make(1.0f, 1.0f, 1.0f)];
 }
 
 - (void)dealloc
 {
-    [self _invalidateModelMatrixCache];
+    [self rz_invalidateModelMatrixCache];
 }
 
 #pragma mark - public methods
@@ -63,19 +63,19 @@
 - (void)setTranslation:(GLKVector3)translation
 {
     _translation = translation;
-    [self _invalidateModelMatrixCache];
+    [self rz_invalidateModelMatrixCache];
 }
 
 - (void)setScale:(GLKVector3)scale
 {
     _scale = scale;
-    [self _invalidateModelMatrixCache];
+    [self rz_invalidateModelMatrixCache];
 }
 
 - (void)setRotation:(GLKQuaternion)rotation
 {
     _rotation = rotation;
-    [self _invalidateModelMatrixCache];
+    [self rz_invalidateModelMatrixCache];
 }
 
 #pragma mark - NSCopying
@@ -93,7 +93,7 @@
 
 #pragma mark - private methods
 
-- (instancetype)_initWithTranslation:(GLKVector3)trans rotation:(GLKQuaternion)rot scale:(GLKVector3)scale
+- (instancetype)initWithTranslation:(GLKVector3)trans rotation:(GLKQuaternion)rot scale:(GLKVector3)scale
 {
     self = [super init];
     if ( self ) {
@@ -106,7 +106,7 @@
     return self;
 }
 
-- (void)_invalidateModelMatrixCache
+- (void)rz_invalidateModelMatrixCache
 {
     free(_cachedModelMatrix);
     _cachedModelMatrix = NULL;

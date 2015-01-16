@@ -58,7 +58,7 @@ void RZGenerateQuadMesh(NSInteger subdivisions, GLvoid **vertices, GLuint *numVe
     RZQuadMesh *mesh = nil;
     
     if ( [EAGLContext currentContext] != nil ) {
-        mesh = [[self alloc] _initWithSubdivisionLevel:subdivisons];
+        mesh = [[self alloc] initWithSubdivisionLevel:subdivisons];
     }
     else {
         NSLog(@"Failed to initialize %@: No active EAGLContext.", NSStringFromClass(self));
@@ -144,7 +144,7 @@ void RZGenerateQuadMesh(NSInteger subdivisions, GLvoid **vertices, GLuint *numVe
 
 #pragma mark - private methods
 
-- (instancetype)_initWithSubdivisionLevel:(NSInteger)subdivisions
+- (instancetype)initWithSubdivisionLevel:(NSInteger)subdivisions
 {
     self = [super init];
     if ( self ) {

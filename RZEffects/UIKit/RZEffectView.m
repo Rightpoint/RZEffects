@@ -48,8 +48,8 @@
         _effect = effect;
         _dynamic = dynamic;
         
-        [self _commonInit];
-        [self _createTexture];
+        [self rz_commonInit];
+        [self rz_createTexture];
     }
     return self;
 }
@@ -59,7 +59,7 @@
     self = [super initWithCoder:aDecoder];
     if ( self ) {
         _dynamic = NO;
-        [self _commonInit];
+        [self rz_commonInit];
     }
     return self;
 }
@@ -68,7 +68,7 @@
 {
     [super awakeFromNib];
     
-    [self _createTexture];
+    [self rz_createTexture];
 }
 
 - (void)dealloc
@@ -111,7 +111,7 @@
     
     if ( self.context != nil ) {
         [EAGLContext setCurrentContext:self.context];
-        [self _updateBuffers];
+        [self rz_updateBuffers];
     }
 }
 
@@ -121,7 +121,7 @@
     
     if ( self.context != nil ) {
         [EAGLContext setCurrentContext:self.context];
-        [self _updateBuffers];
+        [self rz_updateBuffers];
     }
 }
 
@@ -130,7 +130,7 @@
     [super setBackgroundColor:backgroundColor];
     
     if ( self.context != nil ) {
-        [self _setClearColorWithColor:backgroundColor];
+        [self rz_setClearColorWithColor:backgroundColor];
     }
 }
 
@@ -158,14 +158,14 @@
 {
     [EAGLContext setCurrentContext:self.context];
     
-    [self _setEffect:effect];
+    [self rz_setEffect:effect];
 }
 
 - (void)setModel:(id<RZRenderable>)model
 {
     [EAGLContext setCurrentContext:self.context];
     
-    [self _setModel:model];
+    [self rz_setModel:model];
 }
 
 - (void)setNeedsDisplay
@@ -191,7 +191,7 @@
     return context;
 }
 
-- (void)_commonInit
+- (void)rz_commonInit
 {
     CAEAGLLayer *glLayer = (CAEAGLLayer *)self.layer;
     glLayer.contentsScale = [UIScreen mainScreen].scale;
@@ -206,23 +206,23 @@
     self.effectTransform = [RZTransform3D transform];
     
     if ( [EAGLContext setCurrentContext:self.context] ) {
-        [self _updateBuffers];
-        [self _setEffect:self.effect];
+        [self rz_updateBuffers];
+        [self rz_setEffect:self.effect];
         
         self.renderLoop = [RZRenderLoop renderLoop];
-        [self.renderLoop setUpdateTarget:self action:@selector(_update:)];
-        [self.renderLoop setRenderTarget:self action:@selector(_render)];
+        [self.renderLoop setUpdateTarget:self action:@selector(rz_update:)];
+        [self.renderLoop setRenderTarget:self action:@selector(rz_render)];
 
         self.framesPerSecond = 60;
         
-        [self _setClearColorWithColor:self.backgroundColor];
+        [self rz_setClearColorWithColor:self.backgroundColor];
         
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
     }
 }
 
-- (void)_createBuffers
+- (void)rz_createBuffers
 {
     glGenFramebuffers(1, &_fbo);
     glGenRenderbuffers(1, &_crb);
@@ -247,18 +247,18 @@
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
-- (void)_updateBuffers
+- (void)rz_updateBuffers
 {
-    [self _destroyBuffers];
+    [self rz_destroyBuffers];
     
     if ( CGRectGetWidth(self.bounds) > 0.0f && CGRectGetHeight(self.bounds) > 0.0f ) {
-        [self _createBuffers];
+        [self rz_createBuffers];
     }
     
     glViewport(0, 0, _backingWidth, _backingHeight);
 }
 
-- (void)_destroyBuffers
+- (void)rz_destroyBuffers
 {
     glDeleteFramebuffers(1, &_fbo);
     glDeleteRenderbuffers(1, &_crb);
@@ -272,15 +272,15 @@
     _backingHeight = 0;
 }
 
-- (void)_createTexture
+- (void)rz_createTexture
 {
     if ( self.sourceView != nil ) {
         [EAGLContext setCurrentContext:self.context];
-        [self _setViewTexture:[RZViewTexture textureWithSize:self.sourceView.bounds.size]];
+        [self rz_setViewTexture:[RZViewTexture textureWithSize:self.sourceView.bounds.size]];
     }
 }
 
-- (void)_setEffect:(RZEffect *)effect
+- (void)rz_setEffect:(RZEffect *)effect
 {
     [_effect teardownGL];
     
@@ -288,32 +288,32 @@
     
     if ( [effect link] ) {
         if ( self.sourceView != nil ) {
-            [self _setModel:[RZQuadMesh quadWithSubdivisionLevel:effect.preferredLevelOfDetail]];
+            [self rz_setModel:[RZQuadMesh quadWithSubdivisionLevel:effect.preferredLevelOfDetail]];
         }
         
         _effect = effect;
     }
     else {
-        [self _setModel:nil];
+        [self rz_setModel:nil];
         _effect = nil;
     }
 }
 
-- (void)_setViewTexture:(RZViewTexture *)viewTexture
+- (void)rz_setViewTexture:(RZViewTexture *)viewTexture
 {
     [_viewTexture teardownGL];
     _viewTexture = viewTexture;
     [_viewTexture setupGL];
 }
 
-- (void)_setModel:(id<RZRenderable>)model
+- (void)rz_setModel:(id<RZRenderable>)model
 {
     [_model teardownGL];
     _model = model;
     [_model setupGL];
 }
 
-- (void)_setClearColorWithColor:(UIColor *)color
+- (void)rz_setClearColorWithColor:(UIColor *)color
 {
     [EAGLContext setCurrentContext:self.context];
     
@@ -343,7 +343,7 @@
     }
 }
 
-- (void)_update:(CFTimeInterval)dt
+- (void)rz_update:(CFTimeInterval)dt
 {
     if ( self.isDynamic || !self.textureLoaded ) {
         [self.viewTexture updateWithView:self.sourceView synchronous:NO];
@@ -351,7 +351,7 @@
     }
 }
 
-- (void)_render
+- (void)rz_render
 {
     [EAGLContext setCurrentContext:self.context];
     glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
