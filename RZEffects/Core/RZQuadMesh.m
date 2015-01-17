@@ -180,7 +180,7 @@ void RZGenerateQuadMesh(NSInteger subdivisions, GLvoid **vertices, GLuint *numVe
                 verts[v++] = 1.0f - ptStep * y;
                 verts[v++] = 0.0f;
                 verts[v++] = texStep * x;
-                verts[v++] = texStep * y;
+                verts[v++] = 1.0f - texStep * y;
                 
                 if ( x < subs && y < subs ) {
                     idxs[i++] = y * pts + x;

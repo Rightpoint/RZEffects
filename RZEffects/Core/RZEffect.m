@@ -77,6 +77,11 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
 
 #pragma mark - public methods
 
+- (NSInteger)preferredLevelOfDetail
+{
+    return 0;
+}
+
 - (BOOL)link
 {
     [self.uniforms removeAllObjects];
@@ -118,7 +123,7 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
     return self.isLinked;
 }
 
-- (void)prepareToDraw
+- (BOOL)prepareToDraw
 {
     [self bindGL];
     
@@ -136,6 +141,8 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
     {
         glUniformMatrix3fv(_normalMatrixLoc, 1, GL_FALSE, _normalMatrix.m);
     }
+    
+    return NO;
 }
 
 - (void)bindAttribute:(NSString *)attribute location:(GLuint)location
@@ -207,6 +214,7 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
         
         _modelViewMatrix = GLKMatrix4Identity;
         _projectionMatrix = GLKMatrix4Identity;
+        _normalMatrix = GLKMatrix3Identity;
         
         _uniforms = [[NSCache alloc] init];
     }

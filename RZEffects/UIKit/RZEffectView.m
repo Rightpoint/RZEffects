@@ -13,9 +13,11 @@
 #import "RZQuadMesh.h"
 
 @interface RZEffectView () {
-    GLuint _fbo;
+    GLuint _fbos[2];
     GLuint _crb;
-    GLuint _drb;
+    GLuint _drbs[2];
+    
+    GLuint _auxTex;
     
     GLint _backingWidth;
     GLint _backingHeight;
@@ -224,10 +226,10 @@
 
 - (void)rz_createBuffers
 {
-    glGenFramebuffers(1, &_fbo);
+    glGenFramebuffers(2, _fbos);
     glGenRenderbuffers(1, &_crb);
     
-    glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, _fbos[0]);
     glBindRenderbuffer(GL_RENDERBUFFER, _crb);
     
     [self.context renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer *)self.layer];
@@ -236,12 +238,24 @@
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &_backingWidth);
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &_backingHeight);
     
-    glGenRenderbuffers(1, &_drb);
-    glBindRenderbuffer(GL_RENDERBUFFER, _drb);
+    glGenRenderbuffers(2, _drbs);
+    glBindRenderbuffer(GL_RENDERBUFFER, _drbs[0]);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24_OES, _backingWidth, _backingHeight);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _drb);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _drbs[0]);
     
-    glBindRenderbuffer(GL_RENDERBUFFER, _crb);
+    glBindFramebuffer(GL_FRAMEBUFFER, _fbos[1]);
+    glBindRenderbuffer(GL_RENDERBUFFER, _drbs[1]);
+    
+    glGenTextures(1, &_auxTex);
+    
+    glBindTexture(GL_TEXTURE_2D, _auxTex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,  _backingWidth, _backingHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _auxTex, 0);
+    
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24_OES, _backingWidth, _backingHeight);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _drbs[1]);
     
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
@@ -260,13 +274,13 @@
 
 - (void)rz_destroyBuffers
 {
-    glDeleteFramebuffers(1, &_fbo);
+    glDeleteFramebuffers(2, _fbos);
     glDeleteRenderbuffers(1, &_crb);
-    glDeleteRenderbuffers(1, &_drb);
+    glDeleteRenderbuffers(2, _drbs);
     
-    _fbo = 0;
+    memset(_fbos, 0, 2 * sizeof(GLuint));
     _crb = 0;
-    _drb = 0;
+    memset(_drbs, 0, 2 * sizeof(GLuint));
     
     _backingWidth = 0;
     _backingHeight = 0;
@@ -354,9 +368,6 @@
 - (void)rz_render
 {
     [EAGLContext setCurrentContext:self.context];
-    glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
-    
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     glActiveTexture(GL_TEXTURE0);
     [self.viewTexture bindGL];
@@ -382,7 +393,22 @@
     self.effect.modelViewMatrix = GLKMatrix4Multiply(view, model);
     self.effect.projectionMatrix = projection;
 
-    [self.effect prepareToDraw];
+    while ( [self.effect prepareToDraw] ) {
+        glBindFramebuffer(GL_FRAMEBUFFER, _fbos[1]);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        [self display];
+        
+        const GLenum discards[]  = {GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT};
+        glDiscardFramebufferEXT(GL_FRAMEBUFFER, 2, discards);
+        
+        // TODO: what if more than 2 effects?
+        glBindTexture(GL_TEXTURE_2D, _auxTex);
+    };
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, _fbos[0]);
+    
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     [self display];
     
