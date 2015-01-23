@@ -9,8 +9,6 @@
 
 @interface RZClothEffect : RZEffect
 
-+ (instancetype)effect;
-
 @property (assign, nonatomic) GLKVector2 anchors;
 
 @property (assign, nonatomic) GLfloat waveCount;
@@ -21,5 +19,7 @@
 @property (assign, nonatomic) GLKVector3 ambientLight;
 @property (assign, nonatomic) GLKVector3 diffuseLight;
 @property (assign, nonatomic) GLKVector3 specularLight;
+
++ (instancetype)effect;
 
 @end

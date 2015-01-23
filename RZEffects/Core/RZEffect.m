@@ -10,6 +10,42 @@
 
 #import "RZEffect.h"
 
+NSString* const kRZEffectDefaultVSH2D = RZ_SHADER_SRC(
+attribute vec4 a_position;
+attribute vec2 a_texCoord0;
+                                                  
+varying vec2 v_texCoord0;
+                                                  
+void main(void)
+{
+    v_texCoord0 = a_texCoord0;
+    gl_Position = a_position;
+});
+
+NSString* const kRZEffectDefaultVSH3D = RZ_SHADER_SRC(
+uniform mat4 u_MVPMatrix;
+
+attribute vec4 a_position;
+attribute vec2 a_texCoord0;
+
+varying vec2 v_texCoord0;
+
+void main(void)
+{
+    v_texCoord0 = a_texCoord0;
+    gl_Position = u_MVPMatrix * a_position;
+});
+
+NSString* const kRZEffectDefaultFSH = RZ_SHADER_SRC(
+uniform lowp sampler2D u_Texture;
+                                                    
+varying highp vec2 v_texCoord0;
+                                         
+void main()
+{
+    gl_FragColor = texture2D(u_Texture, v_texCoord0);
+});
+
 GLuint RZCompileShader(const GLchar *source, GLenum type);
 
 @interface RZEffect () {
@@ -76,6 +112,11 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
 }
 
 #pragma mark - public methods
+
+- (void)setDownsampleLevel:(GLuint)downsampleLevel
+{
+    _downsampleLevel = MIN(downsampleLevel, RZ_EFFECT_MAX_DOWNSAMPLE);
+}
 
 - (NSInteger)preferredLevelOfDetail
 {

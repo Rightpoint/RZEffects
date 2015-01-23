@@ -60,7 +60,7 @@ uniform vec3 u_Ambient;
 uniform vec3 u_Diffuse;
 uniform vec3 u_Specular;
 
-uniform sampler2D u_Texture;
+uniform lowp sampler2D u_Texture;
 
 varying vec4 v_position;
 varying vec3 v_normal;

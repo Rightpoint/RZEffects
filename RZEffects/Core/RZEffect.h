@@ -9,6 +9,13 @@
 
 #import "RZEffectsCommon.h"
 
+OBJC_EXTERN NSString* const kRZEffectDefaultVSH2D;
+OBJC_EXTERN NSString* const kRZEffectDefaultVSH3D;
+
+OBJC_EXTERN NSString* const kRZEffectDefaultFSH;
+
+#define RZ_EFFECT_MAX_DOWNSAMPLE 4
+
 #define RZ_SHADER_SRC(src) (@#src)
 
 @interface RZEffect : NSObject <RZOpenGLObject>
@@ -22,6 +29,9 @@
 @property (copy, nonatomic) NSString *mvpUniform;
 @property (copy, nonatomic) NSString *mvUniform;
 @property (copy, nonatomic) NSString *normalMatrixUniform;
+
+@property (assign, nonatomic) GLKVector2 resolution;
+@property (assign, nonatomic) GLuint downsampleLevel;
 
 @property (nonatomic, readonly) NSInteger preferredLevelOfDetail;
 

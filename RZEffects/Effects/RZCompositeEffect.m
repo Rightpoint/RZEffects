@@ -46,6 +46,17 @@
     self.secondEffect.normalMatrix = normalMatrix;
 }
 
+- (void)setResolution:(GLKVector2)resolution
+{
+    self.firstEffect.resolution = resolution;
+    self.secondEffect.resolution = resolution;
+}
+
+- (GLuint)downsampleLevel
+{
+    return [super downsampleLevel] + self.currentEffect.downsampleLevel;
+}
+
 - (NSInteger)preferredLevelOfDetail
 {
     return MAX(self.firstEffect.preferredLevelOfDetail, self.secondEffect.preferredLevelOfDetail);

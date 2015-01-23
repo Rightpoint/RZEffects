@@ -12,14 +12,18 @@
 #import "RZViewTexture.h"
 #import "RZQuadMesh.h"
 
+#import "RZBlurEffect.h"
+
 static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0};
+
+#define RZ_EFFECT_AUX_TEXTURES (RZ_EFFECT_MAX_DOWNSAMPLE + 1)
 
 @interface RZEffectView () {
     GLuint _fbos[2];
     GLuint _crb;
     GLuint _drbs[2];
     
-    GLuint _auxTex[2];
+    GLuint _auxTex[2][RZ_EFFECT_AUX_TEXTURES];
     
     GLint _backingWidth;
     GLint _backingHeight;
@@ -96,17 +100,6 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     }
 }
 
-- (void)layoutSubviews
-{
-    [super layoutSubviews];
-    
-    CGFloat aspectRatio = (CGRectGetWidth(self.bounds) / CGRectGetWidth(self.bounds));
-    self.effectCamera.aspectRatio = aspectRatio;
-    
-    GLKVector3 camTrans = GLKVector3Make(0.0f, 0.0f, -1.0f / tanf(self.effectCamera.fieldOfView / 2.0f));
-    self.effectTransform.translation = GLKVector3Add(self.effectTransform.translation, camTrans);
-}
-
 #pragma mark - public methods
 
 - (void)setFrame:(CGRect)frame
@@ -115,7 +108,7 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     
     if ( self.context != nil ) {
         [EAGLContext setCurrentContext:self.context];
-        [self rz_updateBuffers];
+        [self rz_updateBuffersWithSize:frame.size];
     }
 }
 
@@ -125,7 +118,7 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     
     if ( self.context != nil ) {
         [EAGLContext setCurrentContext:self.context];
-        [self rz_updateBuffers];
+        [self rz_updateBuffersWithSize:bounds.size];
     }
 }
 
@@ -203,6 +196,10 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     glLayer.drawableProperties = @{ kEAGLDrawablePropertyColorFormat : kEAGLColorFormatRGBA8,
                                     kEAGLDrawablePropertyRetainedBacking : @(NO) };
     
+    self.backgroundColor = [UIColor clearColor];
+    self.opaque = NO;
+    self.userInteractionEnabled = NO;
+    
     self.context = [[self class] bestContext];
     
     self.effectCamera = [RZCamera cameraWithFieldOfView:GLKMathDegreesToRadians(30.0f) aspectRatio:1.0f nearClipping:0.001f farClipping:10.0f];
@@ -210,7 +207,7 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     self.effectTransform = [RZTransform3D transform];
     
     if ( [EAGLContext setCurrentContext:self.context] ) {
-        [self rz_updateBuffers];
+        [self rz_updateBuffersWithSize:self.bounds.size];
         [self rz_setEffect:self.effect];
         
         self.renderLoop = [RZRenderLoop renderLoop];
@@ -235,7 +232,6 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     glBindRenderbuffer(GL_RENDERBUFFER, _crb);
     
     [self.context renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer *)self.layer];
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, _crb);
     
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &_backingWidth);
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &_backingHeight);
@@ -248,29 +244,40 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     glBindFramebuffer(GL_FRAMEBUFFER, _fbos[1]);
     glBindRenderbuffer(GL_RENDERBUFFER, _drbs[1]);
     
-    glGenTextures(2, _auxTex);
+    glGenTextures(2 * RZ_EFFECT_AUX_TEXTURES, _auxTex[0]);
     
-    glBindTexture(GL_TEXTURE_2D, _auxTex[0]);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,  _backingWidth, _backingHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    
-    glBindTexture(GL_TEXTURE_2D, _auxTex[1]);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,  _backingWidth, _backingHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    for ( int tex = 0; tex < 2; tex++ ) {
+        for ( int i = 0; i < RZ_EFFECT_AUX_TEXTURES; i++ ) {
+            GLsizei denom = pow(2.0, i);
+            
+            glBindTexture(GL_TEXTURE_2D, _auxTex[tex][i]);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _backingWidth / denom, _backingHeight / denom, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        }
+    }
     
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24_OES, _backingWidth, _backingHeight);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _drbs[1]);
     
+    glBindTexture(GL_TEXTURE_2D, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
-- (void)rz_updateBuffers
+- (void)rz_updateBuffersWithSize:(CGSize)size
 {
     [self rz_destroyBuffers];
     
-    if ( CGRectGetWidth(self.bounds) > 0.0f && CGRectGetHeight(self.bounds) > 0.0f ) {
+    if ( size.width > 0.0f && size.height > 0.0f ) {
         [self rz_createBuffers];
+        
+        CGFloat aspectRatio = (CGRectGetWidth(self.bounds) / CGRectGetWidth(self.bounds));
+        self.effectCamera.aspectRatio = aspectRatio;
+        
+        GLKVector3 camTrans = GLKVector3Make(0.0f, 0.0f, -1.0f / tanf(self.effectCamera.fieldOfView / 2.0f));
+        self.effectTransform.translation = GLKVector3Add(self.effectTransform.translation, camTrans);
     }
     
     glViewport(0, 0, _backingWidth, _backingHeight);
@@ -282,13 +289,13 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
         glDeleteFramebuffers(2, _fbos);
         glDeleteRenderbuffers(1, &_crb);
         glDeleteRenderbuffers(2, _drbs);
-        glDeleteTextures(2, _auxTex);
+        glDeleteTextures(2 * RZ_EFFECT_AUX_TEXTURES, _auxTex[0]);
     }
     
     memset(_fbos, 0, 2 * sizeof(GLuint));
     _crb = 0;
     memset(_drbs, 0, 2 * sizeof(GLuint));
-    memset(_auxTex, 0, 2 * sizeof(GLuint));
+    memset(_auxTex, 0, 2 * RZ_EFFECT_AUX_TEXTURES * sizeof(GLuint));
     
     _backingWidth = 0;
     _backingHeight = 0;
@@ -373,13 +380,8 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     }
 }
 
-- (void)rz_render
+- (void)rz_congfigureEffect
 {
-    [EAGLContext setCurrentContext:self.context];
-    
-    glActiveTexture(GL_TEXTURE0);
-    [self.viewTexture bindGL];
-    
     GLKMatrix4 model, view, projection;
     
     if ( self.effectTransform != nil ) {
@@ -398,39 +400,64 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
         projection = GLKMatrix4Identity;
     }
     
+    self.effect.resolution = GLKVector2Make(_backingWidth, _backingHeight);
     self.effect.modelViewMatrix = GLKMatrix4Multiply(view, model);
     self.effect.projectionMatrix = projection;
+}
 
-    int tex = 0;
+- (void)rz_render
+{
+    [EAGLContext setCurrentContext:self.context];
+    
+    [self.viewTexture bindGL];
+    
+    [self rz_congfigureEffect];
+
+    int fbo = 0;
+    
+    GLuint downsample = self.effect.downsampleLevel;
+    GLint denom = pow(2.0, downsample);
     
     while ( [self.effect prepareToDraw] ) {
-        glBindFramebuffer(GL_FRAMEBUFFER, _fbos[1]);
+        glViewport(0, 0, _backingWidth/denom, _backingHeight/denom);
+        glBindFramebuffer(GL_FRAMEBUFFER, _fbos[fbo]);
         
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _auxTex[tex], 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _auxTex[fbo][downsample], 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         [self display];
         
         glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, s_GLDiscards);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
+        glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, &s_GLDiscards[1]);
         
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glBindTexture(GL_TEXTURE_2D, _auxTex[fbo][downsample]);
+        fbo = 1 - fbo;
         
-        glBindTexture(GL_TEXTURE_2D, _auxTex[tex]);
-        tex = 1 - tex;
+        downsample = self.effect.downsampleLevel;
+        denom = pow(2.0, downsample);
     };
     
-    glBindFramebuffer(GL_FRAMEBUFFER, _fbos[0]);
+    // TODO: what if the last effect has lower downsample?
+    
+    glViewport(0, 0, _backingWidth, _backingHeight);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, _fbos[fbo]);
+    
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, _crb);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     [self display];
     
-    glDiscardFramebufferEXT(GL_FRAMEBUFFER, 2, s_GLDiscards);
+    glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, s_GLDiscards);
     
     glBindRenderbuffer(GL_RENDERBUFFER, _crb);
     [self.context presentRenderbuffer:GL_RENDERBUFFER];
+
+    glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, &s_GLDiscards[1]);
     
-    glBindTexture(GL_TEXTURE_2D, 0);
     glUseProgram(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
