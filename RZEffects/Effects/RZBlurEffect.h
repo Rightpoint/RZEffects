@@ -9,7 +9,8 @@
 
 @interface RZBlurEffect : RZCompositeEffect
 
-+ (instancetype)effect;
-+ (RZCompositeEffect *)effectWithSigma:(GLint)sigma scale:(GLfloat)scale;
+@property (assign, nonatomic) GLint sigma;
+
++ (instancetype)effectWithSigma:(GLint)sigma;
 
 @end

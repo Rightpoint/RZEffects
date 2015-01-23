@@ -15,7 +15,7 @@ typedef NS_ENUM(NSUInteger, RZBlurDirection) {
 };
 
 static const GLfloat kRZBlurEffectMinTexelContribution = 1.0f / 256.0f;
-static const GLuint kRZBlurEffectMaxVaryingCoords = 8;
+static const GLuint kRZBlurEffectMaxVaryingCoords = 9;
 
 void RZGetGaussianBlurWeights(GLfloat **weights, GLint *n, GLint sigma, GLint radius);
 void RZGetGaussianBlurOffsets(GLfloat **offsets, GLint *n, const GLfloat *weights, GLint numWeights);
@@ -31,22 +31,24 @@ void RZGetGaussianBlurOffsets(GLfloat **offsets, GLint *n, const GLfloat *weight
 
 @implementation RZBlurEffect
 
-+ (instancetype)effect
++ (instancetype)effectWithSigma:(GLint)sigma
 {
-    RZEffect *e1 = [RZBlurEffect effectWithSigma:5 scale:3];
+    RZEffect *e1 = [RZBlurEffect rz_effectWithSigma:5 downsample:3];
     
-    RZEffect *e2 = [RZBlurEffect effectWithSigma:12 scale:0];
+    RZEffect *e2 = [RZBlurEffect rz_effectWithSigma:8 downsample:0];
     
     return [self compositeEffectWithFirstEffect:e1 secondEffect:e2];
 }
 
-+ (RZCompositeEffect *)effectWithSigma:(GLint)sigma scale:(GLfloat)scale
+#pragma mark - private methods
+
++ (RZCompositeEffect *)rz_effectWithSigma:(GLint)sigma downsample:(GLint)downsample
 {
     RZBlurEffectPartial *e1 = [RZBlurEffectPartial effectWithSigma:sigma direction:kRZBlurDirectionHorizontal];
-    e1.downsampleLevel = scale;
+    e1.downsampleLevel = downsample;
     
     RZBlurEffectPartial *e2 = [RZBlurEffectPartial effectWithSigma:sigma direction:kRZBlurDirectionVertical];
-    e2.downsampleLevel = scale;
+    e2.downsampleLevel = downsample;
     
     RZCompositeEffect *comp1 = [RZCompositeEffect compositeEffectWithFirstEffect:e1 secondEffect:e2];
     
@@ -59,28 +61,28 @@ void RZGetGaussianBlurOffsets(GLfloat **offsets, GLint *n, const GLfloat *weight
 
 + (instancetype)effectWithSigma:(GLint)sigma direction:(RZBlurDirection)direction
 {
-    // compute a nice blur radius for the given sigma
-    GLint radius = sqrt(-2.0 * sigma * sigma * log(kRZBlurEffectMinTexelContribution * sqrt(2.0 * M_PI * sigma * sigma)));
-    
-    GLfloat *weights, *offsets;
-    GLint numWeights, numOffsets;
-    
-    RZGetGaussianBlurWeights(&weights, &numWeights, sigma, radius);
-    RZGetGaussianBlurOffsets(&offsets, &numOffsets, weights, numWeights);
-    
     NSString *vsh, *fsh;
     
-    if ( radius < 1 ) {
+    if ( sigma < 2 ) {
         vsh = kRZEffectDefaultVSH2D;
         fsh = kRZEffectDefaultFSH;
     }
     else {
+        // compute a nice blur radius for the given sigma
+        GLint radius = sqrt(-2.0 * sigma * sigma * log(kRZBlurEffectMinTexelContribution * sqrt(2.0 * M_PI * sigma * sigma)));
+        
+        GLfloat *weights, *offsets;
+        GLint numWeights, numOffsets;
+        
+        RZGetGaussianBlurWeights(&weights, &numWeights, sigma, radius);
+        RZGetGaussianBlurOffsets(&offsets, &numOffsets, weights, numWeights);
+        
         vsh = [self rz_vertexShaderForDirection:direction offsets:offsets numOffsets:numOffsets];
         fsh = [self rz_fragmentShaderForDirection:direction weights:weights numWeights:numWeights offsets:offsets numOffsets:numOffsets];
+        
+        free(weights);
+        free(offsets);
     }
-    
-    free(weights);
-    free(offsets);
     
     RZBlurEffectPartial *effect = [self effectWithVertexShader:vsh fragmentShader:fsh];
     effect.sigma = sigma;

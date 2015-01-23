@@ -28,6 +28,11 @@
     return effect;
 }
 
+- (BOOL)isLinked
+{
+    return self.firstEffect.isLinked && self.secondEffect.isLinked;
+}
+
 - (void)setModelViewMatrix:(GLKMatrix4)modelViewMatrix
 {
     self.firstEffect.modelViewMatrix = modelViewMatrix;
