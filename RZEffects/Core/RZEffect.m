@@ -240,34 +240,6 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
     glDeleteProgram(_name);
 }
 
-#pragma mark - NSCopying
-
-- (id)copyWithZone:(NSZone *)zone
-{
-    RZEffect *copy = [[self class] effectWithVertexShader:self.vshSrc fragmentShader:self.fshSrc];
-
-    copy->_name = _name;
-    copy->_mvpMatrixLoc = _mvpMatrixLoc;
-    copy->_mvMatrixLoc = _mvMatrixLoc;
-    copy->_normalMatrixLoc = _normalMatrixLoc;
-
-    copy->_modelViewMatrix = GLKMatrix4Identity;
-    copy->_projectionMatrix = GLKMatrix4Identity;
-    copy->_normalMatrix = GLKMatrix3Identity;
-
-    copy.linked = self.isLinked;
-
-    copy.resolution = self.resolution;
-    copy.downsampleLevel = self.downsampleLevel;
-
-    copy.uniforms = [self.uniforms copy];
-    copy.mvpUniform = self.mvpUniform;
-    copy.mvUniform = self.mvUniform;
-    copy.normalMatrixUniform = self.normalMatrixUniform;
-
-    return copy;
-}
-
 #pragma mark - private methods
 
 - (instancetype)initWithVertexShader:(NSString *)vsh fragmentShader:(NSString *)fsh

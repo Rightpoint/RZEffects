@@ -18,7 +18,7 @@ OBJC_EXTERN NSString* const kRZEffectDefaultFSH;
 
 #define RZ_SHADER_SRC(src) (@#src)
 
-@interface RZEffect : NSObject <RZOpenGLObject, NSCopying>
+@interface RZEffect : NSObject <RZOpenGLObject>
 
 @property (nonatomic, readonly, getter = isLinked) BOOL linked;
 

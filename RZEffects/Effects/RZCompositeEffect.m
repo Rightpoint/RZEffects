@@ -134,17 +134,4 @@
     [self.secondEffect teardownGL];
 }
 
-#pragma mark - NSCopying
-
-- (id)copyWithZone:(NSZone *)zone
-{
-    RZCompositeEffect *copy = [super copyWithZone:zone];
-
-    copy.firstEffect = [self.firstEffect copy];
-    copy.secondEffect = [self.secondEffect copy];
-    copy.currentEffect = (self.currentEffect == self.secondEffect) ? copy.secondEffect : copy.firstEffect;
-
-    return copy;
-}
-
 @end

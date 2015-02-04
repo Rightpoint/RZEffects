@@ -166,24 +166,4 @@ void main(void)
     return NO;
 }
 
-#pragma mark - NSCopying
-
-- (id)copyWithZone:(NSZone *)zone
-{
-    RZClothEffect *copy = [super copyWithZone:zone];
-
-    copy->_anchors = _anchors;
-
-    copy->_waveCount = _waveCount;
-    copy->_waveAmplitude = _waveAmplitude;
-    copy->_waveVelocity = _waveVelocity;
-
-    copy->_lightOffset = _lightOffset;
-    copy->_ambientLight = _ambientLight;
-    copy->_diffuseLight = _diffuseLight;
-    copy->_specularLight = _specularLight;
-
-    return copy;
-}
-
 @end
