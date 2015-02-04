@@ -35,24 +35,32 @@
 
 - (void)setModelViewMatrix:(GLKMatrix4)modelViewMatrix
 {
+    [super setModelViewMatrix:modelViewMatrix];
+
     self.firstEffect.modelViewMatrix = modelViewMatrix;
     self.secondEffect.modelViewMatrix = modelViewMatrix;
 }
 
 - (void)setProjectionMatrix:(GLKMatrix4)projectionMatrix
 {
+    [super setProjectionMatrix:projectionMatrix];
+
     self.firstEffect.projectionMatrix = projectionMatrix;
     self.secondEffect.projectionMatrix = projectionMatrix;
 }
 
 - (void)setNormalMatrix:(GLKMatrix3)normalMatrix
 {
+    [super setNormalMatrix:normalMatrix];
+
     self.firstEffect.normalMatrix = normalMatrix;
     self.secondEffect.normalMatrix = normalMatrix;
 }
 
 - (void)setResolution:(GLKVector2)resolution
 {
+    [super setResolution:resolution];
+
     self.firstEffect.resolution = resolution;
     self.secondEffect.resolution = resolution;
 }
@@ -78,7 +86,12 @@
     
     if ( self.currentEffect == self.firstEffect ) {
         if ( ![self.firstEffect prepareToDraw] ) {
-            self.currentEffect = self.secondEffect;
+            if ( self.secondEffect != nil ) {
+                self.currentEffect = self.secondEffect;
+            }
+            else {
+                unfinished = NO;
+            }
         }
     }
     else {
@@ -119,6 +132,19 @@
 {
     [self.firstEffect teardownGL];
     [self.secondEffect teardownGL];
+}
+
+#pragma mark - NSCopying
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    RZCompositeEffect *copy = [super copyWithZone:zone];
+
+    copy.firstEffect = [self.firstEffect copy];
+    copy.secondEffect = [self.secondEffect copy];
+    copy.currentEffect = (self.currentEffect == self.secondEffect) ? copy.secondEffect : copy.firstEffect;
+
+    return copy;
 }
 
 @end

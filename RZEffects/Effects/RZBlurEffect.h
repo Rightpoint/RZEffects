@@ -7,10 +7,10 @@
 
 #import "RZCompositeEffect.h"
 
-@interface RZBlurEffect : RZCompositeEffect
+@interface RZBlurEffect : RZEffect
 
 @property (assign, nonatomic) GLint sigma;
 
-+ (instancetype)effectWithSigma:(GLint)sigma;
++ (instancetype)effect;
 
 @end
