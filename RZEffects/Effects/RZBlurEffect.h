@@ -9,7 +9,7 @@
 
 @interface RZBlurEffect : RZEffect
 
-@property (assign, nonatomic) GLint sigma;
+@property (assign, nonatomic) GLfloat sigma;
 
 + (instancetype)effect;
 
