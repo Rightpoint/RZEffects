@@ -23,8 +23,8 @@ typedef struct _RZGaussianBlurProperties {
     GLint numOffsets;
 } RZGaussianBlurProperties;
 
-static const GLfloat kRZBlurEffectMinSigma = 2.0f;
-static const GLfloat kRZBlurEffectMaxSigmaPerLevel = 8.0f;
+static const GLfloat kRZBlurEffectMinSigma = 1.0f;
+static const GLfloat kRZBlurEffectMaxSigmaPerLevel = 12.0f;
 static const GLint kRZBlurEffectMaxOffsetsPerLevel = kRZBlurEffectMaxSigmaPerLevel + 1;
 
 @interface RZBlurEffectPartial : RZEffect
