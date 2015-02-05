@@ -14,6 +14,8 @@
 
 #import "RZBlurEffect.h"
 
+static const NSInteger kRZEffectViewDefaultFPS = 30;
+
 static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0};
 
 #define RZ_EFFECT_AUX_TEXTURES (RZ_EFFECT_MAX_DOWNSAMPLE + 1)
@@ -214,7 +216,7 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
         [self.renderLoop setUpdateTarget:self action:@selector(rz_update:)];
         [self.renderLoop setRenderTarget:self action:@selector(rz_render)];
 
-        self.framesPerSecond = 60;
+        self.framesPerSecond = kRZEffectViewDefaultFPS;
         
         [self rz_setClearColorWithColor:self.backgroundColor];
         

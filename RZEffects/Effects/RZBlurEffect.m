@@ -119,12 +119,13 @@ void RZGetGaussianBlurOffsets(GLfloat **offsets, GLint *n, const GLfloat *weight
 {
     [super setResolution:resolution];
 
-    self.firstBlur.resolution = resolution;
+    self.horizontal.resolution = resolution;
+    self.vertical.resolution = resolution;
 }
 
 - (GLuint)downsampleLevel
 {
-    return [super downsampleLevel] + self.currentBlur.downsampleLevel;
+    return [super downsampleLevel] + self.currentBlur.blurDownsample;
 }
 
 - (void)setSigma:(GLfloat)sigma
