@@ -146,7 +146,7 @@ void RZGenerateQuadMesh(NSInteger subdivisions, GLvoid **vertices, GLuint *numVe
 
 - (instancetype)initWithSubdivisionLevel:(NSInteger)subdivisions
 {
-    self = [super init];
+    self = [self init];
     if ( self ) {
         subdivisions = MAX(0, MIN(subdivisions, kRZQuadMeshMaxSubdivisions));
         RZGenerateQuadMesh(subdivisions, &_vertexData, &_vertexCount, &_indexData, &_indexCount);

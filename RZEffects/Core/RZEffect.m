@@ -244,7 +244,7 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
 
 - (instancetype)initWithVertexShader:(NSString *)vsh fragmentShader:(NSString *)fsh
 {
-    self = [super init];
+    self = [self init];
     if ( self ) {
         _vshSrc = vsh;
         _fshSrc = fsh;

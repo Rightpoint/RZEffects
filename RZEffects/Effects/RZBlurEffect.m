@@ -23,8 +23,8 @@ typedef struct _RZGaussianBlurProperties {
     GLint numOffsets;
 } RZGaussianBlurProperties;
 
-static const GLuint kRZBlurEffectMinSigma = 2;
-static const GLuint kRZBlurEffectMaxSigmaPerLevel = 8;
+static const GLfloat kRZBlurEffectMinSigma = 2.0f;
+static const GLfloat kRZBlurEffectMaxSigmaPerLevel = 8.0f;
 static const GLint kRZBlurEffectMaxOffsetsPerLevel = kRZBlurEffectMaxSigmaPerLevel + 1;
 
 @interface RZBlurEffectPartial : RZEffect
@@ -41,7 +41,7 @@ static const GLint kRZBlurEffectMaxOffsetsPerLevel = kRZBlurEffectMaxSigmaPerLev
 @interface RZBlurEffectFull : RZCompositeEffect
 
 @property (assign, nonatomic) GLfloat sigma;
-@property (assign, nonatomic) GLuint downsample;
+@property (assign, nonatomic) GLuint blurDownsample;
 
 @property (assign, nonatomic) RZGaussianBlurProperties blurProperties;
 
@@ -71,7 +71,7 @@ void RZGetGaussianBlurOffsets(GLfloat **offsets, GLint *n, const GLfloat *weight
     RZBlurEffectPartial *vertical = [RZBlurEffectPartial effectWithDirection:kRZBlurDirectionVertical];
 
     RZBlurEffectFull *blur = [RZBlurEffectFull compositeEffectWithFirstEffect:horizontal secondEffect:vertical];
-    blur.sigma = kRZBlurEffectMinSigma;
+    blur.sigma = 0.0f;
 
     RZBlurEffect *effect = [[RZBlurEffect alloc] init];
     effect.horizontal = horizontal;
@@ -129,35 +129,31 @@ void RZGetGaussianBlurOffsets(GLfloat **offsets, GLint *n, const GLfloat *weight
 
 - (void)setSigma:(GLfloat)sigma
 {
-    sigma = MAX(2, sigma);
+    sigma = MAX(0.0f, sigma);
     _sigma = sigma;
 
-    __block GLint remainingSigma = sigma;
-    [[self.blurs copy] enumerateObjectsWithOptions:NSEnumerationReverse usingBlock:^(RZBlurEffectFull *blur, NSUInteger idx, BOOL *stop) {
-        if ( remainingSigma > 0 ) {
-            GLfloat multiplier = powf(2.0f, MIN(self.blurs.count - idx - 1, RZ_EFFECT_MAX_DOWNSAMPLE));
-            GLfloat levelSigma = MIN(remainingSigma / multiplier, kRZBlurEffectMaxSigmaPerLevel);
+    GLint i, downsample;
+    GLfloat remainingSigma = sigma;
 
-            blur.sigma = levelSigma;
-
-            remainingSigma -= levelSigma * multiplier;
-        }
-        else {
-            [self.blurs removeObjectsInRange:NSMakeRange(0, idx + 1)];
-            *stop = YES;
-        }
-    }];
-
-    for ( GLuint i = (GLuint)self.blurs.count; remainingSigma > 0; i = MIN(i + 1, RZ_EFFECT_MAX_DOWNSAMPLE) ) {
-        GLfloat multiplier = powf(2.0f, i);
+    for ( i = (GLint)self.blurs.count - 1, downsample = 0; remainingSigma > 0.0f; i--, downsample = MIN(downsample + 1, RZ_EFFECT_MAX_DOWNSAMPLE) ) {
+        GLfloat multiplier = powf(2.0f, downsample);
         GLfloat levelSigma = MIN(ceilf(remainingSigma / multiplier), kRZBlurEffectMaxSigmaPerLevel);
 
-        [self.blurs insertObject:[self rz_blurWithSigma:levelSigma downsample:i] atIndex:0];
+        if ( i >= 0 ) {
+            ((RZBlurEffect *)self.blurs[i]).sigma = levelSigma;
+        }
+        else {
+            [self.blurs insertObject:[self rz_blurWithSigma:levelSigma downsample:downsample] atIndex:0];
+        }
 
         remainingSigma -= levelSigma * multiplier;
     }
 
-    // TODO: might need to update currentIdx
+    if ( i > 0 ) {
+        [self.blurs removeObjectsInRange:NSMakeRange(0, i)];
+    }
+
+    self.currentIdx = 0;
 }
 
 - (BOOL)prepareToDraw
@@ -212,7 +208,7 @@ void RZGetGaussianBlurOffsets(GLfloat **offsets, GLint *n, const GLfloat *weight
 {
     RZBlurEffectFull *blur = [RZBlurEffectFull compositeEffectWithFirstEffect:self.horizontal secondEffect:self.vertical];
     blur.sigma = sigma;
-    blur.downsample = downsample;
+    blur.blurDownsample = downsample;
 
     return blur;
 }
@@ -254,8 +250,8 @@ void RZGetGaussianBlurOffsets(GLfloat **offsets, GLint *n, const GLfloat *weight
     RZBlurEffectPartial *horizontal = (RZBlurEffectPartial *)self.firstEffect;
     RZBlurEffectPartial *vertical = (RZBlurEffectPartial *)self.secondEffect;
 
-    horizontal.downsampleLevel = self.downsample;
-    vertical.downsampleLevel = self.downsample;
+    horizontal.downsampleLevel = self.blurDownsample;
+    vertical.downsampleLevel = self.blurDownsample;
 
     if ( horizontal.blurProperties.sigma != _blurProperties.sigma ) {
         horizontal.blurProperties = _blurProperties;
@@ -293,21 +289,30 @@ void RZGetGaussianBlurWeights(GLfloat **weights, GLint *n, GLfloat sigma, GLint 
     GLint numWeights = radius + 1;
     *weights = (GLfloat *)malloc(numWeights * sizeof(GLfloat));
 
-    GLfloat norm = (1.0f / sqrtf(2.0f * M_PI * sigma * sigma));
-    (*weights)[0] = norm;
-    GLfloat sum = norm;
+    if ( sigma >= kRZBlurEffectMinSigma ) {
+        GLfloat norm = (1.0f / sqrtf(2.0f * M_PI * sigma * sigma));
+        (*weights)[0] = norm;
+        GLfloat sum = norm;
 
-    // compute standard Gaussian weights using the 1-dimensional Gaussian function
-    for ( GLint i = 1; i < numWeights; i++ ) {
-        GLfloat weight =  norm * exp(-i * i / (2.0 * sigma * sigma));
-        (*weights)[i] = weight;
-        sum += 2.0f * weight;
+        // compute standard Gaussian weights using the 1-dimensional Gaussian function
+        for ( GLint i = 1; i < numWeights; i++ ) {
+            GLfloat weight =  norm * exp(-i * i / (2.0 * sigma * sigma));
+            (*weights)[i] = weight;
+            sum += 2.0f * weight;
+        }
+
+        // normalize weights to prevent the clipping of the Gaussian curve and reduced luminance
+        for ( GLint i = 0; i < numWeights; i++ ) {
+            (*weights)[i] /= sum;
+        }
+    }
+    else {
+        (*weights)[0] = 1.0f;
+        for ( GLint i = 1; i < numWeights; i++ ) {
+            (*weights)[i] = 0.0f;
+        }
     }
 
-    // normalize weights to prevent the clipping of the Gaussian curve and reduced luminance
-    for ( GLint i = 0; i < numWeights; i++ ) {
-        (*weights)[i] /= sum;
-    }
 
     if ( n != NULL ) {
         *n = numWeights;
@@ -327,7 +332,12 @@ void RZGetGaussianBlurOffsets(GLfloat **offsets, GLint *n, const GLfloat *weight
         GLfloat w1 = weights[i * 2 + 1];
         GLfloat w2 = weights[i * 2 + 2];
 
-        (*offsets)[i] = (w1 * (i * 2 + 1) + w2 * (i * 2 + 2)) / (w1 + w2);
+        if ( w1 + w2 > 0.0f ) {
+            (*offsets)[i] = (w1 * (i * 2 + 1) + w2 * (i * 2 + 2)) / (w1 + w2);
+        }
+        else {
+            (*offsets)[i] = 0.0f;
+        }
     }
 
     if ( n != NULL ) {
@@ -352,6 +362,15 @@ void RZGetGaussianBlurOffsets(GLfloat **offsets, GLint *n, const GLfloat *weight
     effect.mvpUniform = @"u_MVPMatrix";
     
     return effect;
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    if ( self ) {
+        _blurProperties.sigma = -1.0f;
+    }
+    return self;
 }
 
 - (void)setBlurProperties:(RZGaussianBlurProperties)blurProperties
