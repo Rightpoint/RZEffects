@@ -11,6 +11,6 @@
 
 @property (assign, nonatomic) GLfloat sigma;
 
-+ (instancetype)effect;
++ (instancetype)effectWithSigma:(GLfloat)sigma;
 
 @end

@@ -65,19 +65,19 @@ void RZGetGaussianBlurOffsets(GLfloat **offsets, GLint *n, const GLfloat *weight
 
 @implementation RZBlurEffect
 
-+ (instancetype)effect
++ (instancetype)effectWithSigma:(GLfloat)sigma
 {
     RZBlurEffectPartial *horizontal = [RZBlurEffectPartial effectWithDirection:kRZBlurDirectionHorizontal];
     RZBlurEffectPartial *vertical = [RZBlurEffectPartial effectWithDirection:kRZBlurDirectionVertical];
 
     RZBlurEffectFull *blur = [RZBlurEffectFull compositeEffectWithFirstEffect:horizontal secondEffect:vertical];
-    blur.sigma = 0.0f;
 
     RZBlurEffect *effect = [[RZBlurEffect alloc] init];
     effect.horizontal = horizontal;
     effect.vertical = vertical;
 
     effect.blurs = [NSMutableArray arrayWithObject:blur];
+    effect.sigma = sigma;
 
     return effect;
 }
@@ -136,7 +136,7 @@ void RZGetGaussianBlurOffsets(GLfloat **offsets, GLint *n, const GLfloat *weight
     GLint i, downsample;
     GLfloat remainingSigma = sigma;
 
-    for ( i = (GLint)self.blurs.count - 1, downsample = 0; remainingSigma > 0.0f; i--, downsample = MIN(downsample + 1, RZ_EFFECT_MAX_DOWNSAMPLE) ) {
+    for ( i = (GLint)self.blurs.count - 1, downsample = 0; downsample == 0 || remainingSigma > 0.0f; i--, downsample = MIN(downsample + 1, RZ_EFFECT_MAX_DOWNSAMPLE) ) {
         GLfloat multiplier = powf(2.0f, downsample);
         GLfloat levelSigma = MIN(ceilf(remainingSigma / multiplier), kRZBlurEffectMaxSigmaPerLevel);
 
