@@ -179,17 +179,6 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
 
 #pragma mark - private methods
 
-+ (EAGLContext *)bestContext
-{
-    EAGLContext *context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3];
-    
-    if ( context == nil ) {
-        context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-    }
-    
-    return context;
-}
-
 - (void)rz_commonInit
 {
     CAEAGLLayer *glLayer = (CAEAGLLayer *)self.layer;
@@ -202,7 +191,7 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     self.opaque = NO;
     self.userInteractionEnabled = NO;
     
-    self.context = [[self class] bestContext];
+    self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
     
     self.effectCamera = [RZCamera cameraWithFieldOfView:GLKMathDegreesToRadians(30.0f) aspectRatio:1.0f nearClipping:0.001f farClipping:10.0f];
     
