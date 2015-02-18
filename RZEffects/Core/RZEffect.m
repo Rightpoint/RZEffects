@@ -10,6 +10,42 @@
 
 #import "RZEffect.h"
 
+NSString* const kRZEffectDefaultVSH2D = RZ_SHADER_SRC(
+attribute vec4 a_position;
+attribute vec2 a_texCoord0;
+                                                  
+varying vec2 v_texCoord0;
+                                                  
+void main(void)
+{
+    v_texCoord0 = a_texCoord0;
+    gl_Position = a_position;
+});
+
+NSString* const kRZEffectDefaultVSH3D = RZ_SHADER_SRC(
+uniform mat4 u_MVPMatrix;
+
+attribute vec4 a_position;
+attribute vec2 a_texCoord0;
+
+varying vec2 v_texCoord0;
+
+void main(void)
+{
+    v_texCoord0 = a_texCoord0;
+    gl_Position = u_MVPMatrix * a_position;
+});
+
+NSString* const kRZEffectDefaultFSH = RZ_SHADER_SRC(
+uniform lowp sampler2D u_Texture;
+                                                    
+varying highp vec2 v_texCoord0;
+                                         
+void main()
+{
+    gl_FragColor = texture2D(u_Texture, v_texCoord0);
+});
+
 GLuint RZCompileShader(const GLchar *source, GLenum type);
 
 @interface RZEffect () {
@@ -25,7 +61,7 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
 
 @property (nonatomic, readwrite, getter = isLinked) BOOL linked;
 
-@property (nonatomic, strong) NSCache *uniforms;
+@property (strong, nonatomic) NSCache *uniforms;
 
 @end
 
@@ -77,6 +113,16 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
 
 #pragma mark - public methods
 
+- (void)setDownsampleLevel:(GLuint)downsampleLevel
+{
+    _downsampleLevel = MIN(downsampleLevel, RZ_EFFECT_MAX_DOWNSAMPLE);
+}
+
+- (NSInteger)preferredLevelOfDetail
+{
+    return 0;
+}
+
 - (BOOL)link
 {
     [self.uniforms removeAllObjects];
@@ -118,7 +164,7 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
     return self.isLinked;
 }
 
-- (void)prepareToDraw
+- (BOOL)prepareToDraw
 {
     [self bindGL];
     
@@ -136,6 +182,8 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
     {
         glUniformMatrix3fv(_normalMatrixLoc, 1, GL_FALSE, _normalMatrix.m);
     }
+    
+    return NO;
 }
 
 - (void)bindAttribute:(NSString *)attribute location:(GLuint)location
@@ -196,7 +244,7 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
 
 - (instancetype)initWithVertexShader:(NSString *)vsh fragmentShader:(NSString *)fsh
 {
-    self = [super init];
+    self = [self init];
     if ( self ) {
         _vshSrc = vsh;
         _fshSrc = fsh;
@@ -207,6 +255,7 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
         
         _modelViewMatrix = GLKMatrix4Identity;
         _projectionMatrix = GLKMatrix4Identity;
+        _normalMatrix = GLKMatrix3Identity;
         
         _uniforms = [[NSCache alloc] init];
     }

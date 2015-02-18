@@ -74,7 +74,6 @@
         
         glBindTexture(CVOpenGLESTextureGetTarget(_tex), CVOpenGLESTextureGetName(_tex));
         
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         
@@ -84,8 +83,7 @@
         _context = CGBitmapContextCreate(CVPixelBufferGetBaseAddress(_pixBuffer), _texWidth, _texHeight, 8, CVPixelBufferGetBytesPerRow(_pixBuffer), colorSpace, (CGBitmapInfo)kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Host);
         CGColorSpaceRelease(colorSpace);
         
-        CGContextTranslateCTM(_context, 0.0f, _texHeight);
-        CGContextScaleCTM(_context, _scale, -_scale);
+        CGContextScaleCTM(_context, _scale, _scale);
         
         CVPixelBufferUnlockBaseAddress(_pixBuffer, 0);
     }

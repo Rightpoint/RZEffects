@@ -32,7 +32,7 @@ varying vec2 v_texCoord0;
 
 varying vec3 v_lightPosition;
                                                    
-void main(void)\
+void main(void)
 {
     vec4 pos = a_position;
 
@@ -60,7 +60,7 @@ uniform vec3 u_Ambient;
 uniform vec3 u_Diffuse;
 uniform vec3 u_Specular;
 
-uniform sampler2D u_Texture;
+uniform lowp sampler2D u_Texture;
 
 varying vec4 v_position;
 varying vec3 v_normal;
@@ -106,8 +106,6 @@ void main(void)
 {
     RZClothEffect *effect = [super effectWithVertexShader:kRZClothVSH fragmentShader:kRZClothFSH];
     
-    effect.preferredLevelOfDetail = 6;
-    
     effect.anchors = GLKVector2Make(-1.0f, 1.0f);
     
     effect.waveCount = 8.0f;
@@ -134,6 +132,11 @@ void main(void)
     _anchors = anchors;
 }
 
+- (NSInteger)preferredLevelOfDetail
+{
+    return 6;
+}
+
 - (BOOL)link
 {
     [self bindAttribute:@"a_position" location:kRZVertexAttribPosition];
@@ -142,7 +145,7 @@ void main(void)
     return [super link];
 }
 
-- (void)prepareToDraw
+- (BOOL)prepareToDraw
 {
     [super prepareToDraw];
     
@@ -159,6 +162,8 @@ void main(void)
     glUniform3fv([self uniformLoc:@"u_Specular"], 1, _specularLight.v);
     
     glUniform1f([self uniformLoc:@"u_Time"], CACurrentMediaTime());
+    
+    return NO;
 }
 
 @end

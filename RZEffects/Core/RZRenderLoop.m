@@ -18,7 +18,7 @@
 @property (strong, nonatomic) NSInvocation *renderInvocation;
 
 @property (assign, nonatomic, readwrite) CFTimeInterval lastRender;
-@property (assign, nonatomic, readwrite, getter=isRunning, setter=rz_setRunning:) BOOL running;
+@property (assign, nonatomic, readwrite, getter=isRunning) BOOL running;
 
 @end
 
@@ -123,7 +123,7 @@
     self.displayLink = nil;
 }
 
-- (void)rz_setRunning:(BOOL)running
+- (void)setRunning:(BOOL)running
 {
     _running = running;
     self.displayLink.paused = !running;
