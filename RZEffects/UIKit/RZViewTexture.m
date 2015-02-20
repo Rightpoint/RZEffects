@@ -18,9 +18,6 @@
     CVOpenGLESTextureRef _tex;
     
     CGContextRef _context;
-    
-    dispatch_queue_t _renderQueue;
-    dispatch_semaphore_t _renderSemaphore;
 }
 
 @end
@@ -47,11 +44,11 @@
     if ( synchronous ) {
         [self rz_renderView:view];
     }
-    else if ( dispatch_semaphore_wait(_renderSemaphore, DISPATCH_TIME_NOW) == 0 ) {
-        dispatch_async(_renderQueue, ^{
+    else if ( dispatch_semaphore_wait([[self class] renderSemaphore], DISPATCH_TIME_NOW) == 0 ) {
+        dispatch_async([[self class] renderQueue], ^{
             [self rz_renderView:view];
             
-            dispatch_semaphore_signal(_renderSemaphore);
+            dispatch_semaphore_signal([[self class] renderSemaphore]);
         });
     }
 }
@@ -115,6 +112,31 @@
 
 #pragma mark - private methods
 
++ (dispatch_queue_t)renderQueue
+{
+    static dispatch_queue_t s_RenderQueue = nil;
+
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        s_RenderQueue = dispatch_queue_create("com.rzeffects.view-texture-render", DISPATCH_QUEUE_SERIAL);
+        dispatch_set_target_queue(s_RenderQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0));
+    });
+
+    return s_RenderQueue;
+}
+
++ (dispatch_semaphore_t)renderSemaphore
+{
+    static dispatch_semaphore_t s_RenderSemaphore = nil;
+
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        s_RenderSemaphore = dispatch_semaphore_create(2);
+    });
+
+    return s_RenderSemaphore;
+}
+
 - (instancetype)initWithSize:(CGSize)size scale:(CGFloat)scale
 {
     self = [super init];
@@ -124,11 +146,6 @@
         
         _texWidth = size.width * scale;
         _texHeight = size.height * scale;
-        
-        _renderQueue = dispatch_queue_create("com.raizlabs.view-texture-render", DISPATCH_QUEUE_SERIAL);
-        dispatch_set_target_queue(_renderQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0));
-        
-        _renderSemaphore = dispatch_semaphore_create(2);
     }
     return self;
 }
