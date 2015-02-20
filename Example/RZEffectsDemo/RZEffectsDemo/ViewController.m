@@ -52,7 +52,7 @@
         
         self.effectView = [[RZEffectView alloc] initWithSourceView:self.contentView effect:self.effect dynamicContent:YES];
         self.effectView.backgroundColor = [UIColor blackColor];
-        self.effectView.userInteractionEnabled = NO;
+        self.effectView.framesPerSecond = 60;
         
         self.effectView.effectTransform.rotation = GLKQuaternionMake(-0.133518726, 0.259643972, 0.0340433009, 0.955821096);
         
