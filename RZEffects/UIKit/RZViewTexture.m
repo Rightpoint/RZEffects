@@ -8,19 +8,16 @@
 #import <OpenGLES/ES2/glext.h>
 
 #import "RZViewTexture.h"
+#import "RZEffectContext.h"
 
 @interface RZViewTexture () {
     GLsizei _texWidth;
     GLsizei _texHeight;
     
     CVPixelBufferRef _pixBuffer;
-    CVOpenGLESTextureCacheRef _texCache;
     CVOpenGLESTextureRef _tex;
     
     CGContextRef _context;
-    
-    dispatch_queue_t _renderQueue;
-    dispatch_semaphore_t _renderSemaphore;
 }
 
 @end
@@ -47,11 +44,11 @@
     if ( synchronous ) {
         [self rz_renderView:view];
     }
-    else if ( dispatch_semaphore_wait(_renderSemaphore, DISPATCH_TIME_NOW) == 0 ) {
-        dispatch_async(_renderQueue, ^{
+    else if ( dispatch_semaphore_wait([[self class] renderSemaphore], DISPATCH_TIME_NOW) == 0 ) {
+        dispatch_async([[self class] renderQueue], ^{
             [self rz_renderView:view];
             
-            dispatch_semaphore_signal(_renderSemaphore);
+            dispatch_semaphore_signal([[self class] renderSemaphore]);
         });
     }
 }
@@ -60,7 +57,9 @@
 
 - (void)setupGL
 {
-    if ( [EAGLContext currentContext] != nil ) {
+    RZEffectContext *currentContext = [RZEffectContext currentContext];
+
+    if ( currentContext != nil ) {
         [self teardownGL];
         
         NSDictionary *buffersAttrs = @{(__bridge NSString *)kCVPixelBufferIOSurfacePropertiesKey : [NSDictionary dictionary]};
@@ -68,9 +67,8 @@
         CVPixelBufferCreate(NULL, _texWidth, _texHeight, kCVPixelFormatType_32BGRA, (__bridge CFDictionaryRef)(buffersAttrs), &_pixBuffer);
         
         CVPixelBufferLockBaseAddress(_pixBuffer, 0);
-        
-        CVOpenGLESTextureCacheCreate(NULL, NULL, [EAGLContext currentContext], NULL, &_texCache);
-        CVOpenGLESTextureCacheCreateTextureFromImage(NULL, _texCache, _pixBuffer, NULL, GL_TEXTURE_2D, GL_RGBA, _texWidth, _texHeight, GL_BGRA, GL_UNSIGNED_BYTE, 0, &_tex);
+
+        _tex = [currentContext textureWithPixelBuffer:_pixBuffer];
         
         glBindTexture(CVOpenGLESTextureGetTarget(_tex), CVOpenGLESTextureGetName(_tex));
         
@@ -88,7 +86,7 @@
         CVPixelBufferUnlockBaseAddress(_pixBuffer, 0);
     }
     else {
-        NSLog(@"Failed to setup %@: No active EAGLContext.", NSStringFromClass([self class]));
+        NSLog(@"Failed to setup %@: No active RZEffectContext.", NSStringFromClass([self class]));
     }
 }
 
@@ -107,13 +105,34 @@
         glDeleteTextures(1, &name);
         CFRelease(_tex);
     }
-    
-    if ( _texCache != nil ) {
-        CFRelease(_texCache);
-    }
 }
 
 #pragma mark - private methods
+
++ (dispatch_queue_t)renderQueue
+{
+    static dispatch_queue_t s_RenderQueue = nil;
+
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        s_RenderQueue = dispatch_queue_create("com.rzeffects.view-texture-render", DISPATCH_QUEUE_SERIAL);
+        dispatch_set_target_queue(s_RenderQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0));
+    });
+
+    return s_RenderQueue;
+}
+
++ (dispatch_semaphore_t)renderSemaphore
+{
+    static dispatch_semaphore_t s_RenderSemaphore = nil;
+
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        s_RenderSemaphore = dispatch_semaphore_create(2);
+    });
+
+    return s_RenderSemaphore;
+}
 
 - (instancetype)initWithSize:(CGSize)size scale:(CGFloat)scale
 {
@@ -124,11 +143,6 @@
         
         _texWidth = size.width * scale;
         _texHeight = size.height * scale;
-        
-        _renderQueue = dispatch_queue_create("com.raizlabs.view-texture-render", DISPATCH_QUEUE_SERIAL);
-        dispatch_set_target_queue(_renderQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0));
-        
-        _renderSemaphore = dispatch_semaphore_create(2);
     }
     return self;
 }
