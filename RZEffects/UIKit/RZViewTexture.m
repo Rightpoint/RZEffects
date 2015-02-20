@@ -8,13 +8,13 @@
 #import <OpenGLES/ES2/glext.h>
 
 #import "RZViewTexture.h"
+#import "RZEffectContext.h"
 
 @interface RZViewTexture () {
     GLsizei _texWidth;
     GLsizei _texHeight;
     
     CVPixelBufferRef _pixBuffer;
-    CVOpenGLESTextureCacheRef _texCache;
     CVOpenGLESTextureRef _tex;
     
     CGContextRef _context;
@@ -57,7 +57,9 @@
 
 - (void)setupGL
 {
-    if ( [EAGLContext currentContext] != nil ) {
+    RZEffectContext *currentContext = [RZEffectContext currentContext];
+
+    if ( currentContext != nil ) {
         [self teardownGL];
         
         NSDictionary *buffersAttrs = @{(__bridge NSString *)kCVPixelBufferIOSurfacePropertiesKey : [NSDictionary dictionary]};
@@ -65,9 +67,8 @@
         CVPixelBufferCreate(NULL, _texWidth, _texHeight, kCVPixelFormatType_32BGRA, (__bridge CFDictionaryRef)(buffersAttrs), &_pixBuffer);
         
         CVPixelBufferLockBaseAddress(_pixBuffer, 0);
-        
-        CVOpenGLESTextureCacheCreate(NULL, NULL, [EAGLContext currentContext], NULL, &_texCache);
-        CVOpenGLESTextureCacheCreateTextureFromImage(NULL, _texCache, _pixBuffer, NULL, GL_TEXTURE_2D, GL_RGBA, _texWidth, _texHeight, GL_BGRA, GL_UNSIGNED_BYTE, 0, &_tex);
+
+        _tex = [currentContext textureWithPixelBuffer:_pixBuffer];
         
         glBindTexture(CVOpenGLESTextureGetTarget(_tex), CVOpenGLESTextureGetName(_tex));
         
@@ -85,7 +86,7 @@
         CVPixelBufferUnlockBaseAddress(_pixBuffer, 0);
     }
     else {
-        NSLog(@"Failed to setup %@: No active EAGLContext.", NSStringFromClass([self class]));
+        NSLog(@"Failed to setup %@: No active RZEffectContext.", NSStringFromClass([self class]));
     }
 }
 
@@ -103,10 +104,6 @@
         GLuint name = CVOpenGLESTextureGetName(_tex);
         glDeleteTextures(1, &name);
         CFRelease(_tex);
-    }
-    
-    if ( _texCache != nil ) {
-        CFRelease(_texCache);
     }
 }
 

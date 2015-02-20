@@ -6,9 +6,9 @@
 //
 
 #import <OpenGLES/ES2/glext.h>
-#import <OpenGLES/EAGL.h>
 
 #import "RZQuadMesh.h"
+#import "RZEffectContext.h"
 
 typedef struct _RZBufferSet {
     GLuint vbo, ibo;
@@ -55,16 +55,7 @@ void RZGenerateQuadMesh(NSInteger subdivisions, GLvoid **vertices, GLuint *numVe
 
 + (instancetype)quadWithSubdivisionLevel:(NSInteger)subdivisons
 {
-    RZQuadMesh *mesh = nil;
-    
-    if ( [EAGLContext currentContext] != nil ) {
-        mesh = [[self alloc] initWithSubdivisionLevel:subdivisons];
-    }
-    else {
-        NSLog(@"Failed to initialize %@: No active EAGLContext.", NSStringFromClass(self));
-    }
-    
-    return mesh;
+    return [[self alloc] initWithSubdivisionLevel:subdivisons];
 }
 
 - (void)dealloc
@@ -88,7 +79,7 @@ void RZGenerateQuadMesh(NSInteger subdivisions, GLvoid **vertices, GLuint *numVe
 
 - (void)setupGL
 {
-    if ( [EAGLContext currentContext] != nil ) {
+    if ( [RZEffectContext currentContext] != nil ) {
         [self teardownGL];
         
         glGenVertexArraysOES(1, &_vao);
@@ -112,7 +103,7 @@ void RZGenerateQuadMesh(NSInteger subdivisions, GLvoid **vertices, GLuint *numVe
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     else {
-        NSLog(@"Failed to setup %@: No active EAGLContext.", NSStringFromClass([self class]));
+        NSLog(@"Failed to setup %@: No active context!", NSStringFromClass([self class]));
     }
 }
 

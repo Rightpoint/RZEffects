@@ -6,9 +6,9 @@
 //
 
 #import <OpenGLES/ES2/gl.h>
-#import <OpenGLES/EAGL.h>
 
 #import "RZEffect.h"
+#import "RZEffectContext.h"
 
 NSString* const kRZEffectDefaultVSH2D = RZ_SHADER_SRC(
 attribute vec4 a_position;
@@ -45,8 +45,6 @@ void main()
 {
     gl_FragColor = texture2D(u_Texture, v_texCoord0);
 });
-
-GLuint RZCompileShader(const GLchar *source, GLenum type);
 
 @interface RZEffect () {
     GLuint _name;
@@ -214,11 +212,13 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
 
 - (void)setupGL
 {
-    if ( [EAGLContext currentContext] != nil ) {
+    RZEffectContext *currentContext = [RZEffectContext currentContext];
+
+    if ( currentContext != nil ) {
         [self teardownGL];
         
-        GLuint vs = RZCompileShader([self.vshSrc UTF8String], GL_VERTEX_SHADER);
-        GLuint fs = RZCompileShader([self.fshSrc UTF8String], GL_FRAGMENT_SHADER);
+        GLuint vs = [currentContext vertexShaderWithSource:self.vshSrc];
+        GLuint fs = [currentContext fragmentShaderWithSource:self.fshSrc];
         
         _name = glCreateProgram();
         
@@ -226,7 +226,7 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
         glAttachShader(_name, fs);
     }
     else {
-        NSLog(@"Failed to setup %@: No active EAGLContext.", NSStringFromClass([self class]));
+        NSLog(@"Failed to setup %@: No active RZEffectContext.", NSStringFromClass([self class]));
     }
 }
 
@@ -260,35 +260,6 @@ GLuint RZCompileShader(const GLchar *source, GLenum type);
         _uniforms = [[NSCache alloc] init];
     }
     return self;
-}
-
-GLuint RZCompileShader(const GLchar *source, GLenum type)
-{
-    GLuint shader = glCreateShader(type);
-    GLint length = (GLuint)strlen(source);
-    
-    glShaderSource(shader, 1, &source, &length);
-    glCompileShader(shader);
-    
-#if DEBUG
-    GLint success;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    
-    if ( success != GL_TRUE ) {
-        GLint length;
-        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-        
-        GLchar *logText = malloc(length + 1);
-        logText[length] = '\0';
-        glGetShaderInfoLog(shader, length, NULL, logText);
-        
-        fprintf(stderr, "Error compiling shader: %s\n", logText);
-        
-        free(logText);
-    }
-#endif
-    
-    return shader;
 }
 
 @end

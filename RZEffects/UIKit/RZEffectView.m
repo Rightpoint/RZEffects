@@ -122,7 +122,7 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     [super setBackgroundColor:backgroundColor];
 
     [self.context runBlock:^(RZEffectContext *context){
-        [self rz_setClearColorWithColor:backgroundColor];
+        context.clearColor = backgroundColor.CGColor;
     } wait:NO];
 }
 
@@ -200,10 +200,10 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
 
         self.framesPerSecond = kRZEffectViewDefaultFPS;
 
-        [self rz_setClearColorWithColor:self.backgroundColor];
+        context.clearColor = self.backgroundColor.CGColor;
 
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
+        context.depthTestEnabled = YES;
+        context.cullFace = GL_BACK;
     }];
 }
 
@@ -265,8 +265,6 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
         GLKVector3 camTrans = GLKVector3Make(0.0f, 0.0f, -1.0f / tanf(self.effectCamera.fieldOfView / 2.0f));
         self.effectTransform.translation = GLKVector3Add(self.effectTransform.translation, camTrans);
     }
-    
-    glViewport(0, 0, _backingWidth, _backingHeight);
 }
 
 - (void)rz_destroyBuffers
@@ -329,35 +327,6 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     [_model setupGL];
 }
 
-- (void)rz_setClearColorWithColor:(UIColor *)color
-{    
-    if ( color != nil ) {
-        CGColorRef cgColor = color.CGColor;
-        const CGFloat *comps = CGColorGetComponents(cgColor);
-        
-        size_t numComps = CGColorGetNumberOfComponents(cgColor);
-        CGFloat r, g, b, a;
-        r = g = b = a = 0.0f;
-        
-        if ( numComps == 2 ) {
-            const CGFloat *comps = CGColorGetComponents(cgColor);
-            r = b = g = comps[0];
-            a = comps[1];
-        }
-        else if ( numComps == 4 ) {
-            r = comps[0];
-            g = comps[1];
-            b = comps[2];
-            a = comps[3];
-        }
-        
-        glClearColor(r, g, b, a);
-    }
-    else {
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    }
-}
-
 - (void)rz_update:(CFTimeInterval)dt
 {
     if ( self.isDynamic || !self.textureLoaded ) {
@@ -394,6 +363,8 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
 - (void)rz_render
 {
     [self.context runBlock:^(RZEffectContext *context){
+        context.activeTexture = GL_TEXTURE0;
+        
         [self.viewTexture bindGL];
 
         [self rz_congfigureEffect];
@@ -404,7 +375,7 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
         GLint denom = pow(2.0, downsample);
 
         while ( [self.effect prepareToDraw] ) {
-            glViewport(0, 0, _backingWidth/denom, _backingHeight/denom);
+            context.viewport = CGRectMake(0.0f, 0.0f, _backingWidth/denom, _backingHeight/denom);
             glBindFramebuffer(GL_FRAMEBUFFER, _fbos[fbo]);
 
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _auxTex[fbo][downsample], 0);
@@ -425,7 +396,7 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
 
         // TODO: what if the last effect has lower downsample?
 
-        glViewport(0, 0, _backingWidth, _backingHeight);
+        context.viewport = CGRectMake(0.0f, 0.0f, _backingWidth, _backingHeight);
 
         glBindFramebuffer(GL_FRAMEBUFFER, _fbos[fbo]);
 
