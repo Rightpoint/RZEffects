@@ -134,7 +134,7 @@ void main(void)
 
 - (NSInteger)preferredLevelOfDetail
 {
-    return 6;
+    return 5;
 }
 
 - (BOOL)link
