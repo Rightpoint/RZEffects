@@ -84,7 +84,7 @@ static GLuint RZCompileShader(const GLchar *source, GLenum type)
         const char *queueLabel = [NSString stringWithFormat:@"com.rzeffects.context-%lu", (unsigned long)self.hash].UTF8String;
         _contextQueue = dispatch_queue_create(queueLabel, DISPATCH_QUEUE_SERIAL);
 
-        _glContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2 sharegroup:shareContext.glContext.sharegroup];
+        _glContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES3 sharegroup:shareContext.glContext.sharegroup];
         objc_setAssociatedObject(_glContext, @selector(currentContext), self, OBJC_ASSOCIATION_ASSIGN);
 
         _compiledShaders = [NSMutableDictionary dictionary];
