@@ -8,6 +8,7 @@
 #import <OpenGLES/ES2/gl.h>
 
 #import "RZBlurEffect.h"
+#import "RZCompositeEffect.h"
 
 typedef NS_ENUM(NSUInteger, RZBlurDirection) {
     kRZBlurDirectionHorizontal,
@@ -424,7 +425,7 @@ void RZGetGaussianBlurOffsets(GLfloat **offsets, GLint *n, const GLfloat *weight
      \n\
      void main(void)\n\
      {\n\
-     gl_Position = u_MVPMatrix * a_position;\n\
+     gl_Position = a_position;\n\
      v_blurCoords[0] = a_texCoord0;\n\
      ", numOffsets, numOffsets * 2 + 1];
     

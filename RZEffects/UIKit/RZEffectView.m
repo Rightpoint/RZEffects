@@ -296,11 +296,13 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
 
 - (void)rz_setEffect:(RZEffect *)effect
 {
-    [_effect teardownGL];
-    
-    [effect setupGL];
-    
-    if ( [effect link] ) {
+//    [_effect teardownGL];
+
+    if ( !effect.isLinked ) {
+        [effect setupGL];
+    }
+
+    if ( effect.isLinked || [effect link] ) {
         if ( self.sourceView != nil ) {
             [self rz_setModel:[RZQuadMesh quadWithSubdivisionLevel:effect.preferredLevelOfDetail]];
         }
@@ -330,7 +332,7 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
 - (void)rz_update:(CFTimeInterval)dt
 {
     if ( self.isDynamic || !self.textureLoaded ) {
-        [self.viewTexture updateWithView:self.sourceView synchronous:NO];
+        [self.viewTexture updateWithView:self.sourceView synchronous:YES];
         self.textureLoaded = YES;
     }
 }
@@ -393,6 +395,8 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
             downsample = self.effect.downsampleLevel;
             denom = pow(2.0, downsample);
         };
+
+//        glFinish();
 
         // TODO: what if the last effect has lower downsample?
 
