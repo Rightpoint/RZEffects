@@ -332,6 +332,7 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
 - (void)rz_update:(CFTimeInterval)dt
 {
     if ( self.isDynamic || !self.textureLoaded ) {
+#warning Calling drawViewHierarchyInRect with synchronous=NO can cause a crash in this particular example. Set synchronous=YES to avoid the crash.
         [self.viewTexture updateWithView:self.sourceView synchronous:NO];
         self.textureLoaded = YES;
     }
