@@ -332,7 +332,7 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
 - (void)rz_update:(CFTimeInterval)dt
 {
     if ( self.isDynamic || !self.textureLoaded ) {
-        [self.viewTexture updateWithView:self.sourceView synchronous:YES];
+        [self.viewTexture updateWithView:self.sourceView synchronous:NO];
         self.textureLoaded = YES;
     }
 }

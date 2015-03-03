@@ -56,7 +56,6 @@
     if ( self.effectView == nil ) {
         self.effectView = [[RZEffectView alloc] initWithSourceView:self.contentView effect:nil dynamicContent:YES];
         self.effectView.backgroundColor = [UIColor blackColor];
-        self.effectView.framesPerSecond = 30;
         
         [self.view insertSubview:self.effectView aboveSubview:self.contentView];
 
@@ -94,8 +93,6 @@
     else {
         self.effectView.effectTransform.rotation = GLKQuaternionIdentity;
     }
-
-//    self.imageView.hidden = !self.blurSwitch.isOn;
 
     self.effectSlider.value = 0.0f;
     self.lightSlider.value = 0.0f;
