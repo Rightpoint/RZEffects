@@ -8,6 +8,7 @@
 #import <OpenGLES/ES2/gl.h>
 
 #import "RZBlurEffect.h"
+#import "RZCompositeEffect.h"
 
 typedef NS_ENUM(NSUInteger, RZBlurDirection) {
     kRZBlurDirectionHorizontal,
@@ -393,15 +394,17 @@ void RZGetGaussianBlurOffsets(GLfloat **offsets, GLint *n, const GLfloat *weight
     BOOL ret = [super prepareToDraw];
     
     if ( self.updateBlurProperties ) {
-        glUniform1fv([self uniformLoc:@"u_Weights"], _blurProperties.numWeights, _blurProperties.weights);
-        glUniform1fv([self uniformLoc:@"u_Offsets"], _blurProperties.numOffsets, _blurProperties.offsets);
-        
+        [self setFloatUniform:@"u_Weights" value:_blurProperties.weights length:1 count:_blurProperties.numWeights];
+
+        [self setFloatUniform:@"u_Offsets" value:_blurProperties.offsets length:1 count:_blurProperties.numOffsets];
+
         self.updateBlurProperties = NO;
     }
     
     GLfloat scale = powf(2.0, self.downsampleLevel);
+    GLfloat step[2] = {(1 - self.direction) * scale / self.resolution.x, self.direction * scale / self.resolution.y};
     
-    glUniform2f([self uniformLoc:@"u_Step"], (1 - self.direction) * scale / self.resolution.x, self.direction * scale / self.resolution.y);
+    [self setFloatUniform:@"u_Step" value:step length:2 count:1];
     
     return ret;
 }

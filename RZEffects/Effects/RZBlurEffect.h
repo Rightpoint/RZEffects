@@ -5,7 +5,7 @@
 //  Copyright (c) 2015 Raizlabs. All rights reserved.
 //
 
-#import "RZCompositeEffect.h"
+#import "RZEffect.h"
 
 @interface RZBlurEffect : RZEffect
 

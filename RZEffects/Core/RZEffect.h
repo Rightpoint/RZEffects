@@ -46,4 +46,12 @@ OBJC_EXTERN NSString* const kRZEffectDefaultFSH;
 - (void)bindAttribute:(NSString *)attribute location:(GLuint)location;
 - (GLint)uniformLoc:(NSString *)uniformName;
 
+- (void)setFloatUniform:(NSString *)name value:(const GLfloat *)value length:(GLsizei)length count:(GLsizei)count;
+
+- (void)setIntUniform:(NSString *)name value:(const GLint *)value length:(GLsizei)length count:(GLsizei)count;
+
+- (void)setMatrix2Uniform:(NSString *)name value:(const GLKMatrix2 *)value transpose:(GLboolean)transpose count:(GLsizei)count;
+- (void)setMatrix3Uniform:(NSString *)name value:(const GLKMatrix3 *)value transpose:(GLboolean)transpose count:(GLsizei)count;
+- (void)setMatrix4Uniform:(NSString *)name value:(const GLKMatrix4 *)value transpose:(GLboolean)transpose count:(GLsizei)count;
+
 @end

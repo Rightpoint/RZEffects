@@ -48,10 +48,6 @@ void main()
 
 @interface RZEffect () {
     GLuint _name;
-    
-    GLint _mvpMatrixLoc;
-    GLint _mvMatrixLoc;
-    GLint _normalMatrixLoc;
 }
 
 @property (strong, nonatomic) NSString *vshSrc;
@@ -146,19 +142,7 @@ void main()
 #endif
 
     self.linked = (success == GL_TRUE);
-    
-    if ( self.isLinked && self.mvpUniform != nil ) {
-        _mvpMatrixLoc = [self uniformLoc:self.mvpUniform];
-    }
-    
-    if (self.isLinked && self.mvUniform != nil ) {
-        _mvMatrixLoc = [self uniformLoc:self.mvUniform];
-    }
-    
-    if ( self.isLinked && self.normalMatrixUniform != nil ) {
-        _normalMatrixLoc = [self uniformLoc:self.normalMatrixUniform];
-    }
-    
+
     return self.isLinked;
 }
 
@@ -166,19 +150,19 @@ void main()
 {
     [self bindGL];
     
-    if ( _mvpMatrixLoc >= 0 )
+    if ( self.mvpUniform != nil )
     {
         GLKMatrix4 mvpMatrix = GLKMatrix4Multiply(_projectionMatrix, _modelViewMatrix);
-        glUniformMatrix4fv(_mvpMatrixLoc, 1, GL_FALSE, mvpMatrix.m);
+        [self setMatrix4Uniform:self.mvpUniform value:&mvpMatrix transpose:GL_FALSE count:1];
     }
     
-    if ( _mvMatrixLoc >= 0 ) {
-        glUniformMatrix4fv(_mvMatrixLoc, 1, GL_FALSE, _modelViewMatrix.m);
+    if ( self.mvUniform != nil ) {
+        [self setMatrix4Uniform:self.mvUniform value:&_modelViewMatrix transpose:GL_FALSE count:1];
     }
     
-    if ( _normalMatrixLoc >= 0 )
+    if ( self.normalMatrixUniform != nil )
     {
-        glUniformMatrix3fv(_normalMatrixLoc, 1, GL_FALSE, _normalMatrix.m);
+        [self setMatrix3Uniform:self.normalMatrixUniform value:&_normalMatrix transpose:GL_FALSE count:1];
     }
     
     return NO;
@@ -188,6 +172,8 @@ void main()
 {
     glBindAttribLocation(_name, location, [attribute UTF8String]);
 }
+
+#pragma mark - uniforms
 
 - (GLint)uniformLoc:(NSString *)uniformName
 {
@@ -204,8 +190,97 @@ void main()
             [self.uniforms setObject:@(loc) forKey:uniformName];
         }
     }
-    
+
     return loc;
+}
+
+- (void)setFloatUniform:(NSString *)name value:(const GLfloat *)value length:(GLsizei)length count:(GLsizei)count
+{
+    void (*uniformFunc)(GLint, GLsizei, const GLfloat *) = NULL;
+
+    switch ( length ) {
+        case 1: {
+            uniformFunc = glUniform1fv;
+            break;
+        }
+
+        case 2: {
+            uniformFunc = glUniform2fv;
+            break;
+        }
+
+        case 3: {
+            uniformFunc = glUniform3fv;
+            break;
+        }
+
+        case 4: {
+            uniformFunc = glUniform4fv;
+            break;
+        }
+
+        default:
+            break;
+    }
+
+    if ( uniformFunc != NULL ) {
+        uniformFunc([self uniformLoc:name], count, value);
+    }
+    else {
+        NSLog(@"%@ failed to set uniform %@ with invalid length %i", [self class], name, length);
+    }
+}
+
+- (void)setIntUniform:(NSString *)name value:(const GLint *)value length:(GLsizei)length count:(GLsizei)count
+{
+    void (*uniformFunc)(GLint, GLsizei, const GLint *) = NULL;
+
+    switch ( length ) {
+        case 1: {
+            uniformFunc = glUniform1iv;
+            break;
+        }
+
+        case 2: {
+            uniformFunc = glUniform2iv;
+            break;
+        }
+
+        case 3: {
+            uniformFunc = glUniform3iv;
+            break;
+        }
+
+        case 4: {
+            uniformFunc = glUniform4iv;
+            break;
+        }
+
+        default:
+            break;
+    }
+
+    if ( uniformFunc != NULL ) {
+        uniformFunc([self uniformLoc:name], count, value);
+    }
+    else {
+        NSLog(@"%@ failed to set uniform %@ with invalid length %i", [self class], name, length);
+    }
+}
+
+- (void)setMatrix2Uniform:(NSString *)name value:(const GLKMatrix2 *)value transpose:(GLboolean)transpose count:(GLsizei)count
+{
+    glUniformMatrix2fv([self uniformLoc:name], count, transpose, value->m);
+}
+
+- (void)setMatrix3Uniform:(NSString *)name value:(const GLKMatrix3 *)value transpose:(GLboolean)transpose count:(GLsizei)count
+{
+    glUniformMatrix3fv([self uniformLoc:name], count, transpose, value->m);
+}
+
+- (void)setMatrix4Uniform:(NSString *)name value:(const GLKMatrix4 *)value transpose:(GLboolean)transpose count:(GLsizei)count
+{
+    glUniformMatrix4fv([self uniformLoc:name], count, transpose, value->m);
 }
 
 #pragma mark - RZOpenGLObject
@@ -248,10 +323,6 @@ void main()
     if ( self ) {
         _vshSrc = vsh;
         _fshSrc = fsh;
-        
-        _mvpMatrixLoc = -1;
-        _mvMatrixLoc = -1;
-        _normalMatrixLoc = -1;
         
         _modelViewMatrix = GLKMatrix4Identity;
         _projectionMatrix = GLKMatrix4Identity;
