@@ -56,6 +56,7 @@ void main()
 @property (nonatomic, readwrite, getter = isLinked) BOOL linked;
 
 @property (strong, nonatomic) NSCache *uniforms;
+@property (strong, nonatomic) NSCache *uniformValues;
 
 @end
 
@@ -224,7 +225,11 @@ void main()
     }
 
     if ( uniformFunc != NULL ) {
-        uniformFunc([self uniformLoc:name], count, value);
+        size_t byteLength = length * count * sizeof(GLfloat);
+
+        [self rz_setUniform:name value:value length:byteLength setter:^(GLint location) {
+            uniformFunc(location, count, value);
+        }];
     }
     else {
         NSLog(@"%@ failed to set uniform %@ with invalid length %i", [self class], name, length);
@@ -261,7 +266,11 @@ void main()
     }
 
     if ( uniformFunc != NULL ) {
-        uniformFunc([self uniformLoc:name], count, value);
+        size_t byteLength = length * count * sizeof(GLint);
+
+        [self rz_setUniform:name value:value length:byteLength setter:^(GLint location) {
+            uniformFunc(location, count, value);
+        }];
     }
     else {
         NSLog(@"%@ failed to set uniform %@ with invalid length %i", [self class], name, length);
@@ -270,17 +279,23 @@ void main()
 
 - (void)setMatrix2Uniform:(NSString *)name value:(const GLKMatrix2 *)value transpose:(GLboolean)transpose count:(GLsizei)count
 {
-    glUniformMatrix2fv([self uniformLoc:name], count, transpose, value->m);
+    [self rz_setUniform:name value:value->m length:sizeof(value->m) setter:^(GLint location) {
+        glUniformMatrix2fv(location, count, transpose, value->m);
+    }];
 }
 
 - (void)setMatrix3Uniform:(NSString *)name value:(const GLKMatrix3 *)value transpose:(GLboolean)transpose count:(GLsizei)count
 {
-    glUniformMatrix3fv([self uniformLoc:name], count, transpose, value->m);
+    [self rz_setUniform:name value:value->m length:sizeof(value->m) setter:^(GLint location) {
+        glUniformMatrix3fv(location, count, transpose, value->m);
+    }];
 }
 
 - (void)setMatrix4Uniform:(NSString *)name value:(const GLKMatrix4 *)value transpose:(GLboolean)transpose count:(GLsizei)count
 {
-    glUniformMatrix4fv([self uniformLoc:name], count, transpose, value->m);
+    [self rz_setUniform:name value:value->m length:sizeof(value->m) setter:^(GLint location) {
+        glUniformMatrix4fv(location, count, transpose, value->m);
+    }];
 }
 
 #pragma mark - RZOpenGLObject
@@ -329,8 +344,39 @@ void main()
         _normalMatrix = GLKMatrix3Identity;
         
         _uniforms = [[NSCache alloc] init];
+        _uniformValues = [[NSCache alloc] init];
     }
     return self;
+}
+
+- (void)rz_setUniform:(NSString *)uniformName value:(const void *)value length:(size_t)bytes setter:(void (^)(GLint location))setter
+{
+    if ( ![self rz_uniformValueCacheHit:uniformName value:value length:bytes] ) {
+        GLint location = [self uniformLoc:uniformName];
+
+        if ( location >= 0 ) {
+            setter(location);
+
+            NSData *valueData = [NSData dataWithBytes:value length:bytes];
+            [self.uniformValues setObject:valueData forKey:uniformName];
+        }
+    }
+}
+
+
+- (BOOL)rz_uniformValueCacheHit:(NSString *)uniformName value:(const void *)value length:(size_t)length
+{
+    BOOL hit = NO;
+
+    NSData *cachedValue = [self.uniformValues objectForKey:uniformName];
+
+    if ( cachedValue != nil ) {
+        NSData *newValue = [[NSData alloc] initWithBytesNoCopy:(void *)value length:length freeWhenDone:NO];
+
+        hit = [cachedValue isEqualToData:newValue];
+    }
+
+    return hit;
 }
 
 @end
