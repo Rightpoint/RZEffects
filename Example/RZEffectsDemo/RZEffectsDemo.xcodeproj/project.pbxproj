@@ -43,10 +43,8 @@
 		D41B35FD1A844AA30076C724 /* RZEffect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RZEffect.h; sourceTree = "<group>"; };
 		D41B35FE1A844AA30076C724 /* RZEffect.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RZEffect.m; sourceTree = "<group>"; };
 		D41B35FF1A844AA30076C724 /* RZEffectsCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RZEffectsCommon.h; sourceTree = "<group>"; };
-		D41B36001A844AA30076C724 /* RZOpenGLObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RZOpenGLObject.h; sourceTree = "<group>"; };
 		D41B36011A844AA30076C724 /* RZQuadMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RZQuadMesh.h; sourceTree = "<group>"; };
 		D41B36021A844AA30076C724 /* RZQuadMesh.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RZQuadMesh.m; sourceTree = "<group>"; };
-		D41B36031A844AA30076C724 /* RZRenderable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RZRenderable.h; sourceTree = "<group>"; };
 		D41B36041A844AA30076C724 /* RZRenderLoop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RZRenderLoop.h; sourceTree = "<group>"; };
 		D41B36051A844AA30076C724 /* RZRenderLoop.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RZRenderLoop.m; sourceTree = "<group>"; };
 		D41B36061A844AA30076C724 /* RZTransform3D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RZTransform3D.h; sourceTree = "<group>"; };
@@ -76,6 +74,9 @@
 		D41DB82F1A681DDD00BFF5F9 /* RZEffectsDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RZEffectsDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D41DB8341A681DDD00BFF5F9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D41DB8351A681DDD00BFF5F9 /* RZEffectsDemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RZEffectsDemoTests.m; sourceTree = "<group>"; };
+		D4BB74CB1AA9FE6E00F46EAC /* RZOpenGLObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RZOpenGLObject.h; sourceTree = "<group>"; };
+		D4BB74CC1AA9FE6E00F46EAC /* RZRenderable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RZRenderable.h; sourceTree = "<group>"; };
+		D4BB74CD1AA9FF3200F46EAC /* RZUpdateable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RZUpdateable.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,15 +111,14 @@
 		D41B35FA1A844AA30076C724 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				D4BB74CA1AA9FE6E00F46EAC /* Protocols */,
 				D41B35FB1A844AA30076C724 /* RZCamera.h */,
 				D41B35FC1A844AA30076C724 /* RZCamera.m */,
 				D41B35FD1A844AA30076C724 /* RZEffect.h */,
 				D41B35FE1A844AA30076C724 /* RZEffect.m */,
 				D41B35FF1A844AA30076C724 /* RZEffectsCommon.h */,
-				D41B36001A844AA30076C724 /* RZOpenGLObject.h */,
 				D41B36011A844AA30076C724 /* RZQuadMesh.h */,
 				D41B36021A844AA30076C724 /* RZQuadMesh.m */,
-				D41B36031A844AA30076C724 /* RZRenderable.h */,
 				D41B36041A844AA30076C724 /* RZRenderLoop.h */,
 				D41B36051A844AA30076C724 /* RZRenderLoop.m */,
 				D41B36061A844AA30076C724 /* RZTransform3D.h */,
@@ -211,6 +211,16 @@
 				D41DB8341A681DDD00BFF5F9 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		D4BB74CA1AA9FE6E00F46EAC /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				D4BB74CB1AA9FE6E00F46EAC /* RZOpenGLObject.h */,
+				D4BB74CC1AA9FE6E00F46EAC /* RZRenderable.h */,
+				D4BB74CD1AA9FF3200F46EAC /* RZUpdateable.h */,
+			);
+			path = Protocols;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

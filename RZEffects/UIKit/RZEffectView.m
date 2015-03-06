@@ -21,7 +21,7 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
 
 #define RZ_EFFECT_AUX_TEXTURES (RZ_EFFECT_MAX_DOWNSAMPLE + 1)
 
-@interface RZEffectView () {
+@interface RZEffectView () <RZUpdateable, RZRenderable> {
     GLuint _fbos[2];
     GLuint _crb;
     GLuint _drbs[2];
@@ -195,8 +195,8 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
         [self rz_setEffect:self.effect];
 
         self.renderLoop = [RZRenderLoop renderLoop];
-        [self.renderLoop setUpdateTarget:self action:@selector(rz_update:)];
-        [self.renderLoop setRenderTarget:self action:@selector(rz_render)];
+        [self.renderLoop setUpdateTarget:self];
+        [self.renderLoop setRenderTarget:self];
 
         self.framesPerSecond = kRZEffectViewDefaultFPS;
 
@@ -327,14 +327,6 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     [_model setupGL];
 }
 
-- (void)rz_update:(CFTimeInterval)dt
-{
-    if ( self.isDynamic || !self.textureLoaded ) {
-        [self.viewTexture updateWithView:self.sourceView synchronous:NO];
-        self.textureLoaded = YES;
-    }
-}
-
 - (void)rz_congfigureEffect
 {
     GLKMatrix4 model, view, projection;
@@ -360,11 +352,38 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     self.effect.projectionMatrix = projection;
 }
 
-- (void)rz_render
+#pragma mark - RZUpdateable
+
+- (void)update:(NSTimeInterval)dt
+{
+    if ( self.isDynamic || !self.textureLoaded ) {
+        [self.viewTexture updateWithView:self.sourceView synchronous:NO];
+        self.textureLoaded = YES;
+    }
+}
+
+#pragma mark - RZRenderable
+
+- (void)setupGL
+{
+    // TODO
+}
+
+- (void)bindGL
+{
+    // TODO
+}
+
+- (void)teardownGL
+{
+    // TODO
+}
+
+- (void)render
 {
     [self.context runBlock:^(RZEffectContext *context){
         context.activeTexture = GL_TEXTURE0;
-        
+
         [self.viewTexture bindGL];
 
         [self rz_congfigureEffect];
@@ -411,7 +430,7 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
         [context presentRenderbuffer:GL_RENDERBUFFER];
 
         glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, &s_GLDiscards[1]);
-        
+
         glUseProgram(0);
         glBindTexture(GL_TEXTURE_2D, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
