@@ -148,20 +148,20 @@ void main(void)
 - (BOOL)prepareToDraw
 {
     [super prepareToDraw];
-    
-    glUniform2fv([self uniformLoc:@"u_Anchors"], 1, _anchors.v);
-    
-    glUniform1f([self uniformLoc:@"u_Waves"] , _waveCount);
-    glUniform1f([self uniformLoc:@"u_Amplitude"] , _waveAmplitude);
-    glUniform1f([self uniformLoc:@"u_Velocity"] , _waveVelocity);
 
-    
-    glUniform3fv([self uniformLoc:@"u_LightOffset"], 1, _lightOffset.v);
-    glUniform3fv([self uniformLoc:@"u_Ambient"], 1, _ambientLight.v);
-    glUniform3fv([self uniformLoc:@"u_Diffuse"], 1, _diffuseLight.v);
-    glUniform3fv([self uniformLoc:@"u_Specular"], 1, _specularLight.v);
-    
-    glUniform1f([self uniformLoc:@"u_Time"], CACurrentMediaTime());
+    [self setFloatUniform:@"u_Anchors" value:_anchors.v length:2 count:1];
+
+    [self setFloatUniform:@"u_Waves" value:&_waveCount length:1 count:1];
+    [self setFloatUniform:@"u_Amplitude" value:&_waveAmplitude length:1 count:1];
+    [self setFloatUniform:@"u_Velocity" value:&_waveVelocity length:1 count:1];
+
+    [self setFloatUniform:@"u_LightOffset" value:_lightOffset.v length:3 count:1];
+    [self setFloatUniform:@"u_Ambient" value:_ambientLight.v length:3 count:1];
+    [self setFloatUniform:@"u_Diffuse" value:_diffuseLight.v length:3 count:1];
+    [self setFloatUniform:@"u_Specular" value:_specularLight.v length:3 count:1];
+
+    GLfloat time = CACurrentMediaTime();
+    [self setFloatUniform:@"u_Time" value:&time length:1 count:1];
     
     return NO;
 }
