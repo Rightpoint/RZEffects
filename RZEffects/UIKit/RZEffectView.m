@@ -97,6 +97,13 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     }
 }
 
+- (void)dealloc
+{
+    [self.context runBlock:^(RZEffectContext *context) {
+        [self teardownGL];
+    }];
+}
+
 #pragma mark - public methods
 
 - (void)setFrame:(CGRect)frame
@@ -115,15 +122,6 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     [self.context runBlock:^(RZEffectContext *context){
         [self rz_updateBuffersWithSize:bounds.size];
     }];
-}
-
-- (void)setBackgroundColor:(UIColor *)backgroundColor
-{
-    [super setBackgroundColor:backgroundColor];
-
-    [self.context runBlock:^(RZEffectContext *context){
-        context.clearColor = backgroundColor.CGColor;
-    } wait:NO];
 }
 
 - (void)setPaused:(BOOL)paused
@@ -199,11 +197,6 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
         [self.renderLoop setRenderTarget:self];
 
         self.framesPerSecond = kRZEffectViewDefaultFPS;
-
-        context.clearColor = self.backgroundColor.CGColor;
-
-        context.depthTestEnabled = YES;
-        context.cullFace = GL_BACK;
     }];
 }
 
@@ -364,29 +357,35 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
 
 #pragma mark - RZRenderable
 
-- (void)setupGL
-{
-    // TODO
-}
+- (void)setupGL {}
 
 - (void)bindGL
 {
-    // TODO
+    [self.viewTexture bindGL];
+    [self rz_congfigureEffect];
 }
 
 - (void)teardownGL
 {
-    // TODO
+    [self.renderLoop stop];
+    self.renderLoop = nil;
+
+    [self rz_destroyBuffers];
+    [self.effect teardownGL];
+    [self.model teardownGL];
+    [self.viewTexture teardownGL];
 }
 
 - (void)render
 {
     [self.context runBlock:^(RZEffectContext *context){
+        context.depthTestEnabled = YES;
+        context.cullFace = GL_BACK;
+
         context.activeTexture = GL_TEXTURE0;
+        context.clearColor = self.backgroundColor.CGColor;
 
-        [self.viewTexture bindGL];
-
-        [self rz_congfigureEffect];
+        [self bindGL];
 
         int fbo = 0;
 
