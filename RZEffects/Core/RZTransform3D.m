@@ -39,6 +39,24 @@
 
 #pragma mark - public methods
 
+- (BOOL)isEqual:(id)object
+{
+    BOOL equal = NO;
+
+    if ( self == object ) {
+        equal = YES;
+    }
+    else if ( [object isKindOfClass:[RZTransform3D class]] ) {
+        GLKMatrix4 otherModelMatrix = [(RZTransform3D *)object modelMatrix];
+
+        if ( memcmp(self.modelMatrix.m, otherModelMatrix.m, sizeof(otherModelMatrix.m)) == 0 ) {
+            equal = YES;
+        }
+    }
+
+    return equal;
+}
+
 - (GLKMatrix4)modelMatrix
 {
     @synchronized (self) {
@@ -108,8 +126,10 @@
 
 - (void)rz_invalidateModelMatrixCache
 {
-    free(_cachedModelMatrix);
-    _cachedModelMatrix = NULL;
+    @synchronized (self) {
+        free(_cachedModelMatrix);
+        _cachedModelMatrix = NULL;
+    }
 }
 
 @end
