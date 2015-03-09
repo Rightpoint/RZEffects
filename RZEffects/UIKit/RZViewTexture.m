@@ -34,11 +34,6 @@
     return [[[self class] alloc] initWithSize:size scale:scale];
 }
 
-- (void)dealloc
-{
-    [self teardownGL];
-}
-
 - (void)updateWithView:(UIView *)view synchronous:(BOOL)synchronous
 {
     if ( synchronous ) {
@@ -57,53 +52,61 @@
 
 - (void)setupGL
 {
-    RZEffectContext *currentContext = [RZEffectContext currentContext];
+    @synchronized (self) {
+        RZEffectContext *currentContext = [RZEffectContext currentContext];
 
-    if ( currentContext != nil ) {
-        [self teardownGL];
-        
-        NSDictionary *buffersAttrs = @{(__bridge NSString *)kCVPixelBufferIOSurfacePropertiesKey : [NSDictionary dictionary]};
-        
-        CVPixelBufferCreate(NULL, _texWidth, _texHeight, kCVPixelFormatType_32BGRA, (__bridge CFDictionaryRef)(buffersAttrs), &_pixBuffer);
-        
-        CVPixelBufferLockBaseAddress(_pixBuffer, 0);
+        if ( currentContext != nil ) {
+            [self teardownGL];
+            
+            NSDictionary *buffersAttrs = @{(__bridge NSString *)kCVPixelBufferIOSurfacePropertiesKey : [NSDictionary dictionary]};
+            
+            CVPixelBufferCreate(NULL, _texWidth, _texHeight, kCVPixelFormatType_32BGRA, (__bridge CFDictionaryRef)(buffersAttrs), &_pixBuffer);
+            
+            CVPixelBufferLockBaseAddress(_pixBuffer, 0);
 
-        _tex = [currentContext textureWithPixelBuffer:_pixBuffer];
-        
-        glBindTexture(CVOpenGLESTextureGetTarget(_tex), CVOpenGLESTextureGetName(_tex));
-        
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        
-        glBindTexture(GL_TEXTURE_2D, 0);
-        
-        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-        _context = CGBitmapContextCreate(CVPixelBufferGetBaseAddress(_pixBuffer), _texWidth, _texHeight, 8, CVPixelBufferGetBytesPerRow(_pixBuffer), colorSpace, (CGBitmapInfo)kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Host);
-        CGColorSpaceRelease(colorSpace);
-        
-        CGContextScaleCTM(_context, _scale, _scale);
-        
-        CVPixelBufferUnlockBaseAddress(_pixBuffer, 0);
-    }
-    else {
-        NSLog(@"Failed to setup %@: No active RZEffectContext.", NSStringFromClass([self class]));
+            _tex = [currentContext textureWithPixelBuffer:_pixBuffer];
+            
+            glBindTexture(CVOpenGLESTextureGetTarget(_tex), CVOpenGLESTextureGetName(_tex));
+            
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            
+            glBindTexture(GL_TEXTURE_2D, 0);
+            
+            CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+            _context = CGBitmapContextCreate(CVPixelBufferGetBaseAddress(_pixBuffer), _texWidth, _texHeight, 8, CVPixelBufferGetBytesPerRow(_pixBuffer), colorSpace, (CGBitmapInfo)kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Host);
+            CGColorSpaceRelease(colorSpace);
+            
+            CGContextScaleCTM(_context, _scale, _scale);
+            
+            CVPixelBufferUnlockBaseAddress(_pixBuffer, 0);
+        }
+        else {
+            NSLog(@"Failed to setup %@: No active RZEffectContext.", NSStringFromClass([self class]));
+        }
     }
 }
 
 - (void)bindGL
 {
-    glBindTexture(CVOpenGLESTextureGetTarget(_tex), CVOpenGLESTextureGetName(_tex));
+    @synchronized (self) {
+        glBindTexture(CVOpenGLESTextureGetTarget(_tex), CVOpenGLESTextureGetName(_tex));
+    }
 }
 
 - (void)teardownGL
 {
-    CGContextRelease(_context);
-    CVPixelBufferRelease(_pixBuffer);
-    
-    if ( _tex != nil ) {
-        GLuint name = CVOpenGLESTextureGetName(_tex);
-        glDeleteTextures(1, &name);
-        CFRelease(_tex);
+    @synchronized (self) {
+        CGContextRelease(_context);
+        CVPixelBufferRelease(_pixBuffer);
+
+        if ( _tex != nil ) {
+            CFRelease(_tex);
+        }
+
+        _context = NULL;
+        _pixBuffer = NULL;
+        _tex = NULL;
     }
 }
 

@@ -6,20 +6,22 @@
 //
 
 #import <QuartzCore/QuartzCore.h>
+#import "RZUpdateable.h"
+#import "RZRenderable.h"
 
 @interface RZRenderLoop : NSObject
 
 @property (assign, nonatomic, readonly) CFTimeInterval lastRender;
 @property (assign, nonatomic, readonly, getter=isRunning) BOOL running;
 
-@property (assign, nonatomic) BOOL automaticallyResumeWhenBecomingActive;
+@property (assign, nonatomic) BOOL automaticallyResumeWhenForegrounded;
 
 @property (assign, nonatomic) NSInteger preferredFPS;
 
 + (instancetype)renderLoop;
 
-- (void)setUpdateTarget:(id)target action:(SEL)updateAction;
-- (void)setRenderTarget:(id)target action:(SEL)renderAction;
+- (void)setUpdateTarget:(id<RZUpdateable>)updateTarget;
+- (void)setRenderTarget:(id<RZRenderable>)renderTarget;
 
 - (void)run;
 - (void)stop;

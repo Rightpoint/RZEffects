@@ -21,7 +21,7 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
 
 #define RZ_EFFECT_AUX_TEXTURES (RZ_EFFECT_MAX_DOWNSAMPLE + 1)
 
-@interface RZEffectView () {
+@interface RZEffectView () <RZUpdateable, RZRenderable> {
     GLuint _fbos[2];
     GLuint _crb;
     GLuint _drbs[2];
@@ -97,6 +97,13 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     }
 }
 
+- (void)dealloc
+{
+    [self.context runBlock:^(RZEffectContext *context) {
+        [self teardownGL];
+    }];
+}
+
 #pragma mark - public methods
 
 - (void)setFrame:(CGRect)frame
@@ -115,15 +122,6 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     [self.context runBlock:^(RZEffectContext *context){
         [self rz_updateBuffersWithSize:bounds.size];
     }];
-}
-
-- (void)setBackgroundColor:(UIColor *)backgroundColor
-{
-    [super setBackgroundColor:backgroundColor];
-
-    [self.context runBlock:^(RZEffectContext *context){
-        context.clearColor = backgroundColor.CGColor;
-    } wait:NO];
 }
 
 - (void)setPaused:(BOOL)paused
@@ -195,15 +193,10 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
         [self rz_setEffect:self.effect];
 
         self.renderLoop = [RZRenderLoop renderLoop];
-        [self.renderLoop setUpdateTarget:self action:@selector(rz_update:)];
-        [self.renderLoop setRenderTarget:self action:@selector(rz_render)];
+        [self.renderLoop setUpdateTarget:self];
+        [self.renderLoop setRenderTarget:self];
 
         self.framesPerSecond = kRZEffectViewDefaultFPS;
-
-        context.clearColor = self.backgroundColor.CGColor;
-
-        context.depthTestEnabled = YES;
-        context.cullFace = GL_BACK;
     }];
 }
 
@@ -327,14 +320,6 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     [_model setupGL];
 }
 
-- (void)rz_update:(CFTimeInterval)dt
-{
-    if ( self.isDynamic || !self.textureLoaded ) {
-        [self.viewTexture updateWithView:self.sourceView synchronous:NO];
-        self.textureLoaded = YES;
-    }
-}
-
 - (void)rz_congfigureEffect
 {
     GLKMatrix4 model, view, projection;
@@ -360,14 +345,47 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
     self.effect.projectionMatrix = projection;
 }
 
-- (void)rz_render
+#pragma mark - RZUpdateable
+
+- (void)update:(NSTimeInterval)dt
+{
+    if ( self.isDynamic || !self.textureLoaded ) {
+        [self.viewTexture updateWithView:self.sourceView synchronous:NO];
+        self.textureLoaded = YES;
+    }
+}
+
+#pragma mark - RZRenderable
+
+- (void)setupGL {}
+
+- (void)bindGL
+{
+    [self.viewTexture bindGL];
+    [self rz_congfigureEffect];
+}
+
+- (void)teardownGL
+{
+    [self.renderLoop stop];
+    self.renderLoop = nil;
+
+    [self rz_destroyBuffers];
+    [self.effect teardownGL];
+    [self.model teardownGL];
+    [self.viewTexture teardownGL];
+}
+
+- (void)render
 {
     [self.context runBlock:^(RZEffectContext *context){
-        context.activeTexture = GL_TEXTURE0;
-        
-        [self.viewTexture bindGL];
+        context.depthTestEnabled = YES;
+        context.cullFace = GL_BACK;
 
-        [self rz_congfigureEffect];
+        context.activeTexture = GL_TEXTURE0;
+        context.clearColor = self.backgroundColor.CGColor;
+
+        [self bindGL];
 
         int fbo = 0;
 
@@ -411,7 +429,7 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
         [context presentRenderbuffer:GL_RENDERBUFFER];
 
         glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, &s_GLDiscards[1]);
-        
+
         glUseProgram(0);
         glBindTexture(GL_TEXTURE_2D, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
