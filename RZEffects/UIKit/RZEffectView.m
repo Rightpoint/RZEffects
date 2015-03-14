@@ -128,10 +128,10 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
 {
     if ( paused != _paused ) {
         if ( paused ) {
-            [self.renderLoop run];
+            [self.renderLoop stop];
         }
         else {
-            [self.renderLoop stop];
+            [self.renderLoop run];
         }
         
         _paused = paused;
