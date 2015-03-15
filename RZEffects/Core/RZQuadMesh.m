@@ -79,13 +79,15 @@ void RZGenerateQuadMesh(NSInteger subdivisions, GLvoid **vertices, GLuint *numVe
 
 - (void)setupGL
 {
-    if ( [RZEffectContext currentContext] != nil ) {
+    RZEffectContext *currentContext = [RZEffectContext currentContext];
+
+    if ( currentContext != nil ) {
         [self teardownGL];
         
         glGenVertexArraysOES(1, &_vao);
         glGenBuffers(2, &_bufferSet.vbo);
         
-        glBindVertexArrayOES(_vao);
+        [currentContext bindVertexArray:_vao];
         
         glBindBuffer(GL_ARRAY_BUFFER, _bufferSet.vbo);
         glBufferData(GL_ARRAY_BUFFER, 5 * _vertexCount * sizeof(GLfloat), _vertexData, GL_STATIC_DRAW);
@@ -98,8 +100,7 @@ void RZGenerateQuadMesh(NSInteger subdivisions, GLvoid **vertices, GLuint *numVe
         
         glEnableVertexAttribArray(kRZVertexAttribTexCoord);
         glVertexAttribPointer(kRZVertexAttribTexCoord, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (const GLvoid *)12);
-        
-        glBindVertexArrayOES(0);
+
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     else {
@@ -109,7 +110,7 @@ void RZGenerateQuadMesh(NSInteger subdivisions, GLvoid **vertices, GLuint *numVe
 
 - (void)bindGL
 {
-    glBindVertexArrayOES(_vao);
+    [[RZEffectContext currentContext] bindVertexArray:_vao];
 }
 
 - (void)teardownGL

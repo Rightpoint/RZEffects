@@ -125,7 +125,26 @@
 
 - (void)display
 {
-    // TODO
+    static const GLenum s_GLDiscards[] = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0};
+
+    [self.context runBlock:^(RZEffectContext *context) {
+        glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        [self bindGL];
+
+        [self.model render];
+
+        glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, s_GLDiscards);
+
+        glBindRenderbuffer(GL_RENDERBUFFER, _crb);
+        [context presentRenderbuffer:GL_RENDERBUFFER];
+
+        glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, &s_GLDiscards[1]);
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    }];
 }
 
 #pragma mark - RZUpdateable

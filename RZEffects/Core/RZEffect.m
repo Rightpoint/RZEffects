@@ -322,7 +322,7 @@ void main()
 
 - (void)bindGL
 {
-    glUseProgram(_name);
+    [[RZEffectContext currentContext] useProgram:_name];
 }
 
 - (void)teardownGL

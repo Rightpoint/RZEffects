@@ -13,8 +13,6 @@
 #import "RZViewTexture.h"
 #import "RZQuadMesh.h"
 
-static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0};
-
 #define RZ_EFFECT_AUX_TEXTURES (RZ_EFFECT_MAX_DOWNSAMPLE + 1)
 
 @interface RZGLView (RZProtected)
@@ -78,6 +76,8 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
 
 - (void)display
 {
+    static const GLenum s_GLDiscards[] = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0};
+
     [self.context runBlock:^(RZEffectContext *context){
         context.depthTestEnabled = YES;
         context.cullFace = GL_BACK;
@@ -130,7 +130,6 @@ static const GLenum s_GLDiscards[]  = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
 
         glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, &s_GLDiscards[1]);
 
-        glUseProgram(0);
         glBindTexture(GL_TEXTURE_2D, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
