@@ -110,7 +110,6 @@ void RZGenerateQuadMesh(NSInteger subdivisions, GLvoid **vertices, GLuint *numVe
 - (void)bindGL
 {
     glBindVertexArrayOES(_vao);
-    glBindBuffer(GL_ARRAY_BUFFER, _bufferSet.vbo);
 }
 
 - (void)teardownGL
@@ -125,12 +124,7 @@ void RZGenerateQuadMesh(NSInteger subdivisions, GLvoid **vertices, GLuint *numVe
 
 - (void)render
 {
-    [self bindGL];
-    
     glDrawElements(GL_TRIANGLES, _indexCount, GL_UNSIGNED_SHORT, NULL);
-    
-    glBindVertexArrayOES(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 #pragma mark - private methods
