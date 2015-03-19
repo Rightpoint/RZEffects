@@ -1,6 +1,6 @@
 //
-//  RZSceneDemoTests.m
-//  RZSceneDemoTests
+//  RZXSceneDemoTests.m
+//  RZXSceneDemoTests
 //
 //  Created by John Stricker on 3/19/15.
 //  Copyright (c) 2015 Raizlabs. All rights reserved.
@@ -9,11 +9,11 @@
 #import <UIKit/UIKit.h>
 #import <XCTest/XCTest.h>
 
-@interface RZSceneDemoTests : XCTestCase
+@interface RZXSceneDemoTests : XCTestCase
 
 @end
 
-@implementation RZSceneDemoTests
+@implementation RZXSceneDemoTests
 
 - (void)setUp {
     [super setUp];
