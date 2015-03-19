@@ -57,6 +57,11 @@
     return equal;
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p T:{%.4f, %.4f, %.4f}, R:{%.4f, %.4f, %.4f, %.4f}, S:{%.4f, %.4f, %.4f}>", NSStringFromClass([self class]), self, _translation.x, _translation.y, _translation.z, _rotation.x, _rotation.y, _rotation.z, _rotation.w, _scale.x, _scale.y, _scale.z];
+}
+
 - (GLKMatrix4)modelMatrix
 {
     @synchronized (self) {

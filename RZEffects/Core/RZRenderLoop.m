@@ -9,6 +9,8 @@
 
 #import "RZRenderLoop.h"
 
+static const NSInteger kRZRenderLoopDefaultFPS = 30;
+
 @interface RZRenderLoop ()
 
 @property (strong, nonatomic) CADisplayLink *displayLink;
@@ -69,6 +71,8 @@
 {
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(rz_render:)];
     self.displayLink.paused = YES;
+
+    self.preferredFPS = kRZRenderLoopDefaultFPS;
     
     [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
     
