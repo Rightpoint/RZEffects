@@ -40,7 +40,10 @@ static GLuint RZCompileShader(const GLchar *source, GLenum type)
     return shader;
 }
 
-@interface RZEffectContext ()
+@interface RZEffectContext () {
+    GLuint _currentVAO;
+    GLuint _currentProgram;
+}
 
 @property (strong, nonatomic, readwrite) dispatch_queue_t contextQueue;
 @property (strong, nonatomic) EAGLContext *glContext;
@@ -251,6 +254,28 @@ static GLuint RZCompileShader(const GLchar *source, GLenum type)
     }];
 
     return success;
+}
+
+- (void)bindVertexArray:(GLuint)vao
+{
+    if ( vao != _currentVAO ) {
+        [self runBlock:^(RZEffectContext *context) {
+            glBindVertexArrayOES(vao);
+        }];
+
+        _currentVAO = vao;
+    }
+}
+
+- (void)useProgram:(GLuint)program
+{
+    if ( program != _currentProgram ) {
+        [self runBlock:^(RZEffectContext *context) {
+            glUseProgram(program);
+        }];
+
+        _currentProgram = program;
+    }
 }
 
 - (GLuint)vertexShaderWithSource:(NSString *)vshSrc

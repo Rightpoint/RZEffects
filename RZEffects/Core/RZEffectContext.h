@@ -35,6 +35,9 @@
 - (BOOL)renderbufferStorage:(NSUInteger)target fromDrawable:(id<EAGLDrawable>)drawable;
 - (BOOL)presentRenderbuffer:(NSUInteger)target;
 
+- (void)bindVertexArray:(GLuint)vao;
+- (void)useProgram:(GLuint)program;
+
 - (GLuint)vertexShaderWithSource:(NSString *)vshSrc;
 - (GLuint)fragmentShaderWithSource:(NSString *)fshSrc;
 

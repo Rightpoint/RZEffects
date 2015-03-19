@@ -8,14 +8,14 @@
 
 #import "ViewController.h"
 
-#import "RZEffectView.h"
+#import "RZUIEffectView.h"
 #import "RZClothEffect.h"
 
 @interface ViewController ()
 
 @property (weak, nonatomic) IBOutlet UIView *contentView;
 
-@property (strong, nonatomic) RZEffectView *effectView;
+@property (strong, nonatomic) RZUIEffectView *effectView;
 @property (strong, nonatomic) RZClothEffect *effect;
 
 @end
@@ -50,7 +50,7 @@
 //        uncomment this line for a super shiny cloth
 //        self.effect.lightOffset = GLKVector3Make(0.0f, 1.1f, -3.0f);
         
-        self.effectView = [[RZEffectView alloc] initWithSourceView:self.contentView effect:self.effect dynamicContent:YES];
+        self.effectView = [[RZUIEffectView alloc] initWithSourceView:self.contentView effect:self.effect dynamicContent:YES];
         self.effectView.backgroundColor = [UIColor blackColor];
         self.effectView.framesPerSecond = 60;
         
