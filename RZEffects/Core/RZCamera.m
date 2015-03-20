@@ -7,13 +7,9 @@
 
 #import "RZCamera.h"
 
-@interface RZCamera () {
+@implementation RZCamera {
     GLKMatrix4 *_cachedProjectionMatrix;
 }
-
-@end
-
-@implementation RZCamera
 
 + (instancetype)cameraWithFieldOfView:(float)fov aspectRatio:(float)aspectRatio nearClipping:(float)near farClipping:(float)far
 {

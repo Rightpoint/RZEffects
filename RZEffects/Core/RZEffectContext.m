@@ -40,10 +40,7 @@ static GLuint RZCompileShader(const GLchar *source, GLenum type)
     return shader;
 }
 
-@interface RZEffectContext () {
-    GLuint _currentVAO;
-    GLuint _currentProgram;
-}
+@interface RZEffectContext ()
 
 @property (strong, nonatomic, readwrite) dispatch_queue_t contextQueue;
 @property (strong, nonatomic) EAGLContext *glContext;
@@ -54,7 +51,10 @@ static GLuint RZCompileShader(const GLchar *source, GLenum type)
 
 @end
 
-@implementation RZEffectContext
+@implementation RZEffectContext {
+    GLuint _currentVAO;
+    GLuint _currentProgram;
+}
 
 #pragma mark - lifecycle
 

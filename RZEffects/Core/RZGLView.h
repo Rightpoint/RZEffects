@@ -12,6 +12,9 @@
 
 @class RZEffectContext;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-interface-ivars"
+
 @interface RZGLView : UIView <RZUpdateable, RZRenderable> {
     @protected
     RZEffectContext *_context;
@@ -32,3 +35,5 @@
 - (void)display;
 
 @end
+
+#pragma clang diagnostic pop
