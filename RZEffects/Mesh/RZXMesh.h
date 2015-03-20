@@ -7,7 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "RZEffectsCommon.h"
 
-@interface RZXMesh : NSObject
+@interface RZXMesh : NSObject<RZRenderable>
+
++ (instancetype)meshWithName:(NSString *)name meshFileName:(NSString *)meshFileName;
 
 @end

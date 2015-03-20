@@ -27,6 +27,8 @@
 		8A50A2C31ABB5CB7004A8C5A /* RZUIEffectView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A50A2B61ABB5CB7004A8C5A /* RZUIEffectView.m */; };
 		8A50A2C41ABB5CB7004A8C5A /* RZViewTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A50A2B81ABB5CB7004A8C5A /* RZViewTexture.m */; };
 		8A50A2CB1ABB5E6F004A8C5A /* RZXMesh.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A50A2CA1ABB5E6F004A8C5A /* RZXMesh.m */; };
+		8A65580C1ABC554C00E59FDC /* RZXVertexObjectData.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A65580B1ABC554C00E59FDC /* RZXVertexObjectData.m */; };
+		8A6558121ABC569E00E59FDC /* RZXMeshData.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A6558111ABC569E00E59FDC /* RZXMeshData.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -83,6 +85,10 @@
 		8A50A2B81ABB5CB7004A8C5A /* RZViewTexture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RZViewTexture.m; sourceTree = "<group>"; };
 		8A50A2C91ABB5E6F004A8C5A /* RZXMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RZXMesh.h; path = ../../../RZEffects/Mesh/RZXMesh.h; sourceTree = "<group>"; };
 		8A50A2CA1ABB5E6F004A8C5A /* RZXMesh.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RZXMesh.m; path = ../../../RZEffects/Mesh/RZXMesh.m; sourceTree = "<group>"; };
+		8A65580A1ABC554C00E59FDC /* RZXVertexObjectData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RZXVertexObjectData.h; path = ../../../RZEffects/Mesh/RZXVertexObjectData.h; sourceTree = "<group>"; };
+		8A65580B1ABC554C00E59FDC /* RZXVertexObjectData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RZXVertexObjectData.m; path = ../../../RZEffects/Mesh/RZXVertexObjectData.m; sourceTree = "<group>"; };
+		8A6558101ABC569E00E59FDC /* RZXMeshData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RZXMeshData.h; path = ../../../RZEffects/Mesh/RZXMeshData.h; sourceTree = "<group>"; };
+		8A6558111ABC569E00E59FDC /* RZXMeshData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RZXMeshData.m; path = ../../../RZEffects/Mesh/RZXMeshData.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -237,6 +243,10 @@
 			children = (
 				8A50A2C91ABB5E6F004A8C5A /* RZXMesh.h */,
 				8A50A2CA1ABB5E6F004A8C5A /* RZXMesh.m */,
+				8A65580A1ABC554C00E59FDC /* RZXVertexObjectData.h */,
+				8A65580B1ABC554C00E59FDC /* RZXVertexObjectData.m */,
+				8A6558101ABC569E00E59FDC /* RZXMeshData.h */,
+				8A6558111ABC569E00E59FDC /* RZXMeshData.m */,
 			);
 			name = Mesh;
 			sourceTree = "<group>";
@@ -353,6 +363,8 @@
 				8A50A2BF1ABB5CB7004A8C5A /* RZTransform3D.m in Sources */,
 				8A50A2781ABB5CA1004A8C5A /* AppDelegate.m in Sources */,
 				8A50A2C01ABB5CB7004A8C5A /* RZBlurEffect.m in Sources */,
+				8A65580C1ABC554C00E59FDC /* RZXVertexObjectData.m in Sources */,
+				8A6558121ABC569E00E59FDC /* RZXMeshData.m in Sources */,
 				8A50A2BC1ABB5CB7004A8C5A /* RZGLView.m in Sources */,
 				8A50A2C41ABB5CB7004A8C5A /* RZViewTexture.m in Sources */,
 				8A50A2B91ABB5CB7004A8C5A /* RZCamera.m in Sources */,
@@ -547,6 +559,7 @@
 				8A50A2941ABB5CA1004A8C5A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		8A50A2951ABB5CA1004A8C5A /* Build configuration list for PBXNativeTarget "RZXSceneDemoTests" */ = {
 			isa = XCConfigurationList;
@@ -555,6 +568,7 @@
 				8A50A2971ABB5CA1004A8C5A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
