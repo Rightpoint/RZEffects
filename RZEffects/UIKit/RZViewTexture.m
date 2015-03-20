@@ -10,19 +10,15 @@
 #import "RZViewTexture.h"
 #import "RZEffectContext.h"
 
-@interface RZViewTexture () {
+@implementation RZViewTexture {
     GLsizei _texWidth;
     GLsizei _texHeight;
-    
+
     CVPixelBufferRef _pixBuffer;
     CVOpenGLESTextureRef _tex;
-    
+
     CGContextRef _context;
 }
-
-@end
-
-@implementation RZViewTexture
 
 + (instancetype)textureWithSize:(CGSize)size
 {

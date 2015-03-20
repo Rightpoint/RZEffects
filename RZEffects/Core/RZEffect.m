@@ -46,9 +46,7 @@ void main()
     gl_FragColor = texture2D(u_Texture, v_texCoord0);
 });
 
-@interface RZEffect () {
-    GLuint _name;
-}
+@interface RZEffect ()
 
 @property (strong, nonatomic) NSString *vshSrc;
 @property (strong, nonatomic) NSString *fshSrc;
@@ -60,7 +58,9 @@ void main()
 
 @end
 
-@implementation RZEffect
+@implementation RZEffect {
+    GLuint _name;
+}
 
 #pragma mark - lifecycle
 
@@ -327,7 +327,10 @@ void main()
 
 - (void)teardownGL
 {
-    glDeleteProgram(_name);
+    if ( _name != 0 ) {
+        glDeleteProgram(_name);
+        _name = 0;
+    }
 }
 
 #pragma mark - private methods

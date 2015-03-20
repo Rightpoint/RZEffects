@@ -49,8 +49,8 @@ static const NSInteger kRZRenderLoopDefaultFPS = 30;
 
 - (void)setPreferredFPS:(NSInteger)preferredFPS
 {
-    preferredFPS = MAX(1, MIN(preferredFPS, 60));
-    self.displayLink.frameInterval = 60 / preferredFPS;
+    _preferredFPS = MAX(1, MIN(preferredFPS, 60));
+    self.displayLink.frameInterval = 60 / _preferredFPS;
 }
 
 - (void)run

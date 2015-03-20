@@ -7,13 +7,9 @@
 
 #import "RZTransform3D.h"
 
-@interface RZTransform3D () {
+@implementation RZTransform3D {
     GLKMatrix4 *_cachedModelMatrix;
 }
-
-@end
-
-@implementation RZTransform3D
 
 #pragma mark - lifecycle
 

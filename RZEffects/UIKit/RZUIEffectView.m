@@ -22,12 +22,7 @@
 
 @end
 
-@interface RZUIEffectView () <RZUpdateable, RZRenderable> {
-    GLuint _fbos[2];
-    GLuint _drbs[2];
-    
-    GLuint _auxTex[2][RZ_EFFECT_AUX_TEXTURES];
-}
+@interface RZUIEffectView () <RZUpdateable, RZRenderable>
 
 @property (nonatomic, readonly) RZEffectContext *context;
 
@@ -38,7 +33,12 @@
 
 @end
 
-@implementation RZUIEffectView
+@implementation RZUIEffectView {
+    GLuint _fbos[2];
+    GLuint _drbs[2];
+
+    GLuint _auxTex[2][RZ_EFFECT_AUX_TEXTURES];
+}
 
 #pragma mark - lifecycle
 
@@ -93,10 +93,10 @@
         GLint denom = pow(2.0, downsample);
 
         while ( [self.effect prepareToDraw] ) {
-            context.viewport = CGRectMake(0.0f, 0.0f, _backingWidth/denom, _backingHeight/denom);
-            glBindFramebuffer(GL_FRAMEBUFFER, _fbos[fbo]);
+            context.viewport = CGRectMake(0.0f, 0.0f, self->_backingWidth/denom, self->_backingHeight/denom);
+            glBindFramebuffer(GL_FRAMEBUFFER, self->_fbos[fbo]);
 
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _auxTex[fbo][downsample], 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, self->_auxTex[fbo][downsample], 0);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             [self.model render];
@@ -105,7 +105,7 @@
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
             glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, &s_GLDiscards[1]);
 
-            glBindTexture(GL_TEXTURE_2D, _auxTex[fbo][downsample]);
+            glBindTexture(GL_TEXTURE_2D, self->_auxTex[fbo][downsample]);
             fbo = 1 - fbo;
 
             downsample = self.effect.downsampleLevel;
@@ -114,9 +114,9 @@
 
         // TODO: what if the last effect has lower downsample?
 
-        context.viewport = CGRectMake(0.0f, 0.0f, _backingWidth, _backingHeight);
+        context.viewport = CGRectMake(0.0f, 0.0f, self->_backingWidth, self->_backingHeight);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, _fbos[fbo]);
+        glBindFramebuffer(GL_FRAMEBUFFER, self->_fbos[fbo]);
 
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, _crb);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -125,7 +125,7 @@
 
         glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, s_GLDiscards);
 
-        glBindRenderbuffer(GL_RENDERBUFFER, _crb);
+        glBindRenderbuffer(GL_RENDERBUFFER, self->_crb);
         [context presentRenderbuffer:GL_RENDERBUFFER];
 
         glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, &s_GLDiscards[1]);
@@ -220,9 +220,9 @@
 {
     if ( self.sourceView != nil ) {
         [self.context runBlock:^(RZEffectContext *context) {
-            [_viewTexture teardownGL];
-            _viewTexture = [RZViewTexture textureWithSize:self.sourceView.bounds.size];
-            [_viewTexture setupGL];
+            [self->_viewTexture teardownGL];
+            self->_viewTexture = [RZViewTexture textureWithSize:self.sourceView.bounds.size];
+            [self->_viewTexture setupGL];
         }];
     }
 }
@@ -287,10 +287,12 @@
 
 - (void)setupGL
 {
-    [super setupGL];
+    [self.context runBlock:^(RZEffectContext *context){
+        [super setupGL];
 
-    [self rz_setEffect:self.effect];
-    [self rz_createTexture];
+        [self rz_setEffect:self.effect];
+        [self rz_createTexture];
+    }];
 }
 
 - (void)bindGL
@@ -303,10 +305,12 @@
 
 - (void)teardownGL
 {
-    [super teardownGL];
+    [self.context runBlock:^(RZEffectContext *context){
+        [super teardownGL];
 
-    [self.effect teardownGL];
-    [self.viewTexture teardownGL];
+        [self.effect teardownGL];
+        [self.viewTexture teardownGL];
+    }];
 }
 
 @end
