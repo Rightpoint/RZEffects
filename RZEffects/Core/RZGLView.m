@@ -112,9 +112,9 @@
 - (void)setModel:(id<RZRenderable>)model
 {
     [self.context runBlock:^(RZEffectContext *context) {
-        [_model teardownGL];
-        _model = model;
-        [_model setupGL];
+        [self->_model teardownGL];
+        self->_model = model;
+        [self->_model setupGL];
     }];
 }
 
@@ -128,7 +128,7 @@
     static const GLenum s_GLDiscards[] = {GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0};
 
     [self.context runBlock:^(RZEffectContext *context) {
-        glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, self->_fbo);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         [self bindGL];
@@ -137,7 +137,7 @@
 
         glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, s_GLDiscards);
 
-        glBindRenderbuffer(GL_RENDERBUFFER, _crb);
+        glBindRenderbuffer(GL_RENDERBUFFER, self->_crb);
         [context presentRenderbuffer:GL_RENDERBUFFER];
 
         glDiscardFramebufferEXT(GL_FRAMEBUFFER, 1, &s_GLDiscards[1]);
@@ -158,17 +158,17 @@
 
 - (void)setupGL
 {
-    [self teardownGL];
-
-    self.renderLoop = [RZRenderLoop renderLoop];
-    [self.renderLoop setUpdateTarget:self];
-    [self.renderLoop setRenderTarget:self];
-
-    if ( self.superview != nil && !self.isPaused ) {
-        [self.renderLoop run];
-    }
-
     [self.context runBlock:^(RZEffectContext *context){
+        [self teardownGL];
+
+        self.renderLoop = [RZRenderLoop renderLoop];
+        [self.renderLoop setUpdateTarget:self];
+        [self.renderLoop setRenderTarget:self];
+
+        if ( self.superview != nil && !self.isPaused ) {
+            [self.renderLoop run];
+        }
+
         [self rz_updateBuffersWithSize:self.bounds.size];
     }];
 }
@@ -180,11 +180,13 @@
 
 - (void)teardownGL
 {
-    [self.renderLoop stop];
-    self.renderLoop = nil;
+    [self.context runBlock:^(RZEffectContext *context){
+        [self.renderLoop stop];
+        self.renderLoop = nil;
 
-    [self rz_destroyBuffers];
-    [self.model teardownGL];
+        [self rz_destroyBuffers];
+        [self.model teardownGL];
+    }];
 }
 
 - (void)render

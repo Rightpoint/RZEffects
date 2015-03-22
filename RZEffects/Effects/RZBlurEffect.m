@@ -16,12 +16,13 @@ typedef NS_ENUM(NSUInteger, RZBlurDirection) {
 };
 
 typedef struct _RZGaussianBlurProperties {
-    GLfloat sigma;
     GLfloat *weights;
-    GLint numWeights;
-
     GLfloat *offsets;
+
+    GLint numWeights;
     GLint numOffsets;
+
+    GLfloat sigma;
 } RZGaussianBlurProperties;
 
 static const GLfloat kRZBlurEffectMinSigma = 1.0f;

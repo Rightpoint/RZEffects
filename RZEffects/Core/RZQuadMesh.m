@@ -18,7 +18,7 @@ NSInteger const kRZQuadMeshMaxSubdivisions = 8;
 
 static const GLfloat *s_CachedVertices[kRZQuadMeshMaxSubdivisions];
 static const GLushort *s_CachedIndexes[kRZQuadMeshMaxSubdivisions];
-static const GLint *s_RefCounts[kRZQuadMeshMaxSubdivisions];
+static GLint s_RefCounts[kRZQuadMeshMaxSubdivisions];
 
 static dispatch_semaphore_t s_Semaphore;
 
@@ -26,20 +26,20 @@ void RZGenerateQuadMesh(NSInteger subdivisions, GLvoid **vertices, GLuint *numVe
 
 @interface RZQuadMesh ()
 
-@property (assign, nonatomic) GLuint vao;
-@property (assign, nonatomic) RZBufferSet bufferSet;
-
-@property (assign, nonatomic) GLuint vertexCount;
-@property (assign, nonatomic) GLuint indexCount;
-
-@property (assign, nonatomic) GLvoid *vertexData;
-@property (assign, nonatomic) GLvoid *indexData;
-
 @property (assign, nonatomic) NSInteger subdivisions;
 
 @end
 
-@implementation RZQuadMesh
+@implementation RZQuadMesh {
+    GLuint _vao;
+    RZBufferSet _bufferSet;
+
+    GLuint _vertexCount;
+    GLuint _indexCount;
+
+    GLvoid *_vertexData;
+    GLvoid *_indexData;
+}
 
 #pragma mark - lifecycle
 
