@@ -37,10 +37,10 @@ static RZEffectContext *effectContext;
 {
     RZEffectContext *currentContext = [RZEffectContext currentContext];
     if ( currentContext != nil ) {
-        NSString *cacheKey = [self cacheKeyForContext:currentContext];
+        NSString *cacheKey = [self rzx_cacheKeyForContext:currentContext];
         RZXVertexObjectData *vod = [RZXVertexObjectData fetchCachedObjectDataWithKey:cacheKey];
         if ( vod == nil ) {
-            self.vertexObjectData = [self generateVertexObjectDataForMeshWithFileName:self.meshFileName inContext:currentContext];
+            self.vertexObjectData = [self rzx_generateVertexObjectDataForMeshWithFileName:self.meshFileName inContext:currentContext];
             [vod cacheObjectDataWithKey:cacheKey];
         }
         else {
@@ -78,12 +78,12 @@ static RZEffectContext *effectContext;
     return self;
 }
 
-- (NSString *)cacheKeyForContext:(RZEffectContext *)context
+- (NSString *)rzx_cacheKeyForContext:(RZEffectContext *)context
 {
     return [NSString stringWithFormat:@"%@%p",self.meshName,context];
 }
 
-- (RZXVertexObjectData *)generateVertexObjectDataForMeshWithFileName:(NSString *)fileName inContext:(RZEffectContext *)context
+- (RZXVertexObjectData *)rzx_generateVertexObjectDataForMeshWithFileName:(NSString *)fileName inContext:(RZEffectContext *)context
 {
     NSString* filepathname = [[NSBundle mainBundle] pathForResource:fileName ofType:@"mesh"];
     
@@ -124,11 +124,11 @@ static RZEffectContext *effectContext;
     glBufferData(GL_ARRAY_BUFFER, uniqueVertexArraySize,uniqueVertexArray, GL_STATIC_DRAW);
     
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 32, (char*)NULL + 0);
+    glVertexAttribPointer(kRZVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, 32, (char*)NULL + 0);
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 32, (char*)NULL + 12);
+    glVertexAttribPointer(kRZVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 32, (char*)NULL + 12);
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 32, (char*)NULL + 24);
+    glVertexAttribPointer(kRZVertexAttribTexCoord, 2, GL_FLOAT, GL_FALSE, 32, (char*)NULL + 24);
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     

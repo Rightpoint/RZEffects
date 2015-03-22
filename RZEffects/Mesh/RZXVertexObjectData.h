@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <OpenGLES/gltypes.h>
+#import "RZEffectsCommon.h"
 
 @class RZEffectContext;
 
