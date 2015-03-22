@@ -9,11 +9,19 @@
 #import <Foundation/Foundation.h>
 #import <OpenGLES/gltypes.h>
 
+@class RZEffectContext;
+
 @interface RZXVertexObjectData : NSObject
 
 @property (assign, nonatomic) GLuint vaoIndex;
 @property (assign, nonatomic) GLuint vboIndex;
 @property (assign, nonatomic) GLuint vioIndex;
 @property (assign, nonatomic) GLuint vertexCount;
+
++ (RZXVertexObjectData *)fetchCachedObjectDataWithKey:(NSString *)keyString;
++ (void)deleteAllCachedObjects;
+
+- (void)cacheObjectDataWithKey:(NSString *)keyString;
+- (void)deleteCachedObjectData;
 
 @end

@@ -13,7 +13,6 @@
 #import "RZXVertexObjectData.h"
 #import "RZEffectContext.h"
 
-static NSMutableDictionary *meshVertexObjectIdentifiers;
 static RZEffectContext *effectContext;
 
 @interface RZXMesh()
@@ -27,7 +26,7 @@ static RZEffectContext *effectContext;
 
 @implementation RZXMesh
 
-+ (instancetype) meshWithName:(NSString *)name meshFileName:(NSString *)meshFileName
++ (instancetype)meshWithName:(NSString *)name meshFileName:(NSString *)meshFileName
 {
     return [[self alloc] initWithName:name meshFileName:meshFileName];
 }
@@ -38,10 +37,11 @@ static RZEffectContext *effectContext;
 {
     RZEffectContext *currentContext = [RZEffectContext currentContext];
     if ( currentContext != nil ) {
-        RZXVertexObjectData *vod = [self loadCachedObjectDataForContext:currentContext];
+        NSString *cacheKey = [self cacheKeyForContext:currentContext];
+        RZXVertexObjectData *vod = [RZXVertexObjectData fetchCachedObjectDataWithKey:cacheKey];
         if ( vod == nil ) {
             self.vertexObjectData = [self generateVertexObjectDataForMeshWithFileName:self.meshFileName inContext:currentContext];
-            [self cacheObjectDataForContext:currentContext];
+            [vod cacheObjectDataWithKey:cacheKey];
         }
         else {
             self.vertexObjectData = vod;
@@ -56,14 +56,7 @@ static RZEffectContext *effectContext;
 
 - (void)teardownGL
 {
-    if ( self.vertexObjectData != nil && self.vertexObjectData.vaoIndex != 0 ) {
-        GLuint vaoIndex = self.vertexObjectData.vaoIndex;
-        GLuint vboIndex = self.vertexObjectData.vboIndex;
-        GLuint vioIndex = self.vertexObjectData.vioIndex;
-        glDeleteVertexArraysOES(1, &vaoIndex);
-        glDeleteBuffers(1, &vboIndex);
-        glDeleteBuffers(1, &vioIndex);
-    }
+    [self.vertexObjectData deleteCachedObjectData];
 }
 
 #pragma mark - RZRenderable
@@ -85,25 +78,7 @@ static RZEffectContext *effectContext;
     return self;
 }
 
-- (RZXVertexObjectData *)loadCachedObjectDataForContext:(RZEffectContext *)context
-{
-    if ( meshVertexObjectIdentifiers == nil ) {
-        meshVertexObjectIdentifiers = [[NSMutableDictionary alloc] init];
-    }
-    
-    return meshVertexObjectIdentifiers[[self meshKeyForContext:context]];
-}
-
-- (void)cacheObjectDataForContext:(RZEffectContext *)context
-{
-    if ( meshVertexObjectIdentifiers == nil ) {
-        meshVertexObjectIdentifiers = [[NSMutableDictionary alloc] init];
-    }
-
-    meshVertexObjectIdentifiers[[self meshKeyForContext:context]] = self.vertexObjectData;
-}
-
-- (NSString *)meshKeyForContext:(RZEffectContext *)context
+- (NSString *)cacheKeyForContext:(RZEffectContext *)context
 {
     return [NSString stringWithFormat:@"%@%p",self.meshName,context];
 }
