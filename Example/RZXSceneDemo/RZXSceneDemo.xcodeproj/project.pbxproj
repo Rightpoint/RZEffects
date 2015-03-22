@@ -28,6 +28,8 @@
 		8A50A2C41ABB5CB7004A8C5A /* RZViewTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A50A2B81ABB5CB7004A8C5A /* RZViewTexture.m */; };
 		8A50A2CB1ABB5E6F004A8C5A /* RZXMesh.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A50A2CA1ABB5E6F004A8C5A /* RZXMesh.m */; };
 		8A65580C1ABC554C00E59FDC /* RZXVertexObjectData.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A65580B1ABC554C00E59FDC /* RZXVertexObjectData.m */; };
+		8AA7E3461ABF6E870095C6D3 /* spiral.png in Resources */ = {isa = PBXBuildFile; fileRef = 8AA7E3451ABF6E870095C6D3 /* spiral.png */; };
+		8AA7E3481ABF6E930095C6D3 /* cube.mesh in Resources */ = {isa = PBXBuildFile; fileRef = 8AA7E3471ABF6E930095C6D3 /* cube.mesh */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -86,6 +88,8 @@
 		8A50A2CA1ABB5E6F004A8C5A /* RZXMesh.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RZXMesh.m; path = ../../../RZEffects/Mesh/RZXMesh.m; sourceTree = "<group>"; };
 		8A65580A1ABC554C00E59FDC /* RZXVertexObjectData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RZXVertexObjectData.h; path = ../../../RZEffects/Mesh/RZXVertexObjectData.h; sourceTree = "<group>"; };
 		8A65580B1ABC554C00E59FDC /* RZXVertexObjectData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RZXVertexObjectData.m; path = ../../../RZEffects/Mesh/RZXVertexObjectData.m; sourceTree = "<group>"; };
+		8AA7E3451ABF6E870095C6D3 /* spiral.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spiral.png; sourceTree = "<group>"; };
+		8AA7E3471ABF6E930095C6D3 /* cube.mesh */ = {isa = PBXFileReference; lastKnownFileType = file; path = cube.mesh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -128,6 +132,7 @@
 		8A50A2711ABB5CA1004A8C5A /* RZXSceneDemo */ = {
 			isa = PBXGroup;
 			children = (
+				8AA7E3441ABF6E720095C6D3 /* Resources */,
 				8A50A2C51ABB5CBF004A8C5A /* Mesh */,
 				8A50A2761ABB5CA1004A8C5A /* AppDelegate.h */,
 				8A50A2771ABB5CA1004A8C5A /* AppDelegate.m */,
@@ -246,6 +251,15 @@
 			name = Mesh;
 			sourceTree = "<group>";
 		};
+		8AA7E3441ABF6E720095C6D3 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8AA7E3471ABF6E930095C6D3 /* cube.mesh */,
+				8AA7E3451ABF6E870095C6D3 /* spiral.png */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -326,6 +340,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8AA7E3461ABF6E870095C6D3 /* spiral.png in Resources */,
+				8AA7E3481ABF6E930095C6D3 /* cube.mesh in Resources */,
 				8A50A27E1ABB5CA1004A8C5A /* Main.storyboard in Resources */,
 				8A50A2831ABB5CA1004A8C5A /* LaunchScreen.xib in Resources */,
 				8A50A2801ABB5CA1004A8C5A /* Images.xcassets in Resources */,
