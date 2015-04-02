@@ -19,6 +19,8 @@
 
 @property (assign, nonatomic, getter=isDynamic) IBInspectable BOOL dynamic;
 
+@property (assign, nonatomic) BOOL synchronousUpdate;
+
 - (instancetype)initWithSourceView:(UIView *)view effect:(RZEffect *)effect dynamicContent:(BOOL)dynamic;
 
 @end

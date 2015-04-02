@@ -59,12 +59,20 @@
 {
     [super setFrame:frame];
     [self rz_updateCamera];
+
+    if ( self.viewTexture != nil ) {
+        [self rz_createTexture];
+    }
 }
 
 - (void)setBounds:(CGRect)bounds
 {
     [super setBounds:bounds];
     [self rz_updateCamera];
+
+    if ( self.viewTexture != nil ) {
+        [self rz_createTexture];
+    }
 }
 
 - (void)setEffect:(RZEffect *)effect
@@ -223,6 +231,8 @@
             [self->_viewTexture teardownGL];
             self->_viewTexture = [RZViewTexture textureWithSize:self.sourceView.bounds.size];
             [self->_viewTexture setupGL];
+
+            self.textureLoaded = NO;
         }];
     }
 }
@@ -278,7 +288,7 @@
     [super update:dt];
 
     if ( self.isDynamic || !self.textureLoaded ) {
-        [self.viewTexture updateWithView:self.sourceView synchronous:NO];
+        [self.viewTexture updateWithView:self.sourceView synchronous:self.synchronousUpdate];
         self.textureLoaded = YES;
     }
 }
