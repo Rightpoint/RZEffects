@@ -46,6 +46,7 @@
 {
     self = [super initWithFrame:view.bounds];
     if ( self ) {
+        self.automaticallyAdjustsCamera = YES;
         self.dynamic = dynamic;
         self.effect = effect;
         self.sourceView = view;
@@ -58,7 +59,10 @@
 - (void)setFrame:(CGRect)frame
 {
     [super setFrame:frame];
-    [self rz_updateCamera];
+
+    if ( self.automaticallyAdjustsCamera ) {
+        [self rz_updateCamera];
+    }
 
     if ( self.viewTexture != nil ) {
         [self rz_createTexture];
@@ -68,7 +72,10 @@
 - (void)setBounds:(CGRect)bounds
 {
     [super setBounds:bounds];
-    [self rz_updateCamera];
+
+    if ( self.automaticallyAdjustsCamera ) {
+        [self rz_updateCamera];
+    }
 
     if ( self.viewTexture != nil ) {
         [self rz_createTexture];

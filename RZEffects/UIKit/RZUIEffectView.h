@@ -19,7 +19,8 @@
 
 @property (assign, nonatomic, getter=isDynamic) IBInspectable BOOL dynamic;
 
-@property (assign, nonatomic) BOOL synchronousUpdate;
+@property (assign, nonatomic) BOOL synchronousUpdate; // default NO
+@property (assign, nonatomic) BOOL automaticallyAdjustsCamera; // default YES
 
 - (instancetype)initWithSourceView:(UIView *)view effect:(RZEffect *)effect dynamicContent:(BOOL)dynamic;
 
