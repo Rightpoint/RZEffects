@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A08585D1AC4971200F04BB8 /* RZXNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A08585C1AC4971200F04BB8 /* RZXNode.m */; };
 		8A50A2751ABB5CA1004A8C5A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A50A2741ABB5CA1004A8C5A /* main.m */; };
 		8A50A2781ABB5CA1004A8C5A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A50A2771ABB5CA1004A8C5A /* AppDelegate.m */; };
 		8A50A27B1ABB5CA1004A8C5A /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A50A27A1ABB5CA1004A8C5A /* ViewController.m */; };
@@ -43,6 +44,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		8A08585B1AC4971200F04BB8 /* RZXNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RZXNode.h; sourceTree = "<group>"; };
+		8A08585C1AC4971200F04BB8 /* RZXNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RZXNode.m; sourceTree = "<group>"; };
 		8A50A26F1ABB5CA1004A8C5A /* RZXSceneDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RZXSceneDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A50A2731ABB5CA1004A8C5A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8A50A2741ABB5CA1004A8C5A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -142,6 +145,8 @@
 				8A50A27F1ABB5CA1004A8C5A /* Images.xcassets */,
 				8A50A2811ABB5CA1004A8C5A /* LaunchScreen.xib */,
 				8A50A2721ABB5CA1004A8C5A /* Supporting Files */,
+				8A08585B1AC4971200F04BB8 /* RZXNode.h */,
+				8A08585C1AC4971200F04BB8 /* RZXNode.m */,
 			);
 			path = RZXSceneDemo;
 			sourceTree = "<group>";
@@ -370,6 +375,7 @@
 				8A50A2CB1ABB5E6F004A8C5A /* RZXMesh.m in Sources */,
 				8A50A2C31ABB5CB7004A8C5A /* RZUIEffectView.m in Sources */,
 				8A50A2BD1ABB5CB7004A8C5A /* RZQuadMesh.m in Sources */,
+				8A08585D1AC4971200F04BB8 /* RZXNode.m in Sources */,
 				8A50A2C11ABB5CB7004A8C5A /* RZClothEffect.m in Sources */,
 				8A50A2BF1ABB5CB7004A8C5A /* RZTransform3D.m in Sources */,
 				8A50A2781ABB5CA1004A8C5A /* AppDelegate.m in Sources */,
