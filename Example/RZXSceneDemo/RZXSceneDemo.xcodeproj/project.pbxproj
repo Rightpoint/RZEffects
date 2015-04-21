@@ -7,7 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8A08585D1AC4971200F04BB8 /* RZXNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A08585C1AC4971200F04BB8 /* RZXNode.m */; };
+		8A04F04A1AE157F1006E145B /* RZXNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A04F0491AE157F1006E145B /* RZXNode.m */; };
+		8A04F04E1AE15BE4006E145B /* RZXScene.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A04F04D1AE15BE4006E145B /* RZXScene.m */; };
+		8A04F0521AE15C9D006E145B /* RZXSceneView.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A04F0511AE15C9D006E145B /* RZXSceneView.m */; };
+		8A04F0551AE15CD6006E145B /* RZXModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A04F0541AE15CD6006E145B /* RZXModel.m */; };
+		8A04F0581AE18099006E145B /* RZXBasicModelEffect.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A04F0571AE18099006E145B /* RZXBasicModelEffect.m */; };
 		8A50A2751ABB5CA1004A8C5A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A50A2741ABB5CA1004A8C5A /* main.m */; };
 		8A50A2781ABB5CA1004A8C5A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A50A2771ABB5CA1004A8C5A /* AppDelegate.m */; };
 		8A50A27B1ABB5CA1004A8C5A /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A50A27A1ABB5CA1004A8C5A /* ViewController.m */; };
@@ -44,8 +48,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		8A08585B1AC4971200F04BB8 /* RZXNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RZXNode.h; sourceTree = "<group>"; };
-		8A08585C1AC4971200F04BB8 /* RZXNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RZXNode.m; sourceTree = "<group>"; };
+		8A04F0481AE157F1006E145B /* RZXNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RZXNode.h; path = ../../../RZEffects/Node/RZXNode.h; sourceTree = "<group>"; };
+		8A04F0491AE157F1006E145B /* RZXNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RZXNode.m; path = ../../../RZEffects/Node/RZXNode.m; sourceTree = "<group>"; };
+		8A04F04C1AE15BE4006E145B /* RZXScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RZXScene.h; path = ../../../RZEffects/Node/RZXScene.h; sourceTree = "<group>"; };
+		8A04F04D1AE15BE4006E145B /* RZXScene.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RZXScene.m; path = ../../../RZEffects/Node/RZXScene.m; sourceTree = "<group>"; };
+		8A04F0501AE15C9D006E145B /* RZXSceneView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RZXSceneView.h; path = ../../../RZEffects/Node/RZXSceneView.h; sourceTree = "<group>"; };
+		8A04F0511AE15C9D006E145B /* RZXSceneView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RZXSceneView.m; path = ../../../RZEffects/Node/RZXSceneView.m; sourceTree = "<group>"; };
+		8A04F0531AE15CD6006E145B /* RZXModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RZXModel.h; path = ../../../RZEffects/Node/RZXModel.h; sourceTree = "<group>"; };
+		8A04F0541AE15CD6006E145B /* RZXModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RZXModel.m; path = ../../../RZEffects/Node/RZXModel.m; sourceTree = "<group>"; };
+		8A04F0561AE18099006E145B /* RZXBasicModelEffect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RZXBasicModelEffect.h; sourceTree = "<group>"; };
+		8A04F0571AE18099006E145B /* RZXBasicModelEffect.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RZXBasicModelEffect.m; sourceTree = "<group>"; };
 		8A50A26F1ABB5CA1004A8C5A /* RZXSceneDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RZXSceneDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8A50A2731ABB5CA1004A8C5A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8A50A2741ABB5CA1004A8C5A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -136,6 +148,7 @@
 			isa = PBXGroup;
 			children = (
 				8AA7E3441ABF6E720095C6D3 /* Resources */,
+				8A9E515B1AE061C700C7C656 /* Node */,
 				8A50A2C51ABB5CBF004A8C5A /* Mesh */,
 				8A50A2761ABB5CA1004A8C5A /* AppDelegate.h */,
 				8A50A2771ABB5CA1004A8C5A /* AppDelegate.m */,
@@ -145,8 +158,6 @@
 				8A50A27F1ABB5CA1004A8C5A /* Images.xcassets */,
 				8A50A2811ABB5CA1004A8C5A /* LaunchScreen.xib */,
 				8A50A2721ABB5CA1004A8C5A /* Supporting Files */,
-				8A08585B1AC4971200F04BB8 /* RZXNode.h */,
-				8A08585C1AC4971200F04BB8 /* RZXNode.m */,
 			);
 			path = RZXSceneDemo;
 			sourceTree = "<group>";
@@ -230,6 +241,8 @@
 				8A50A2B11ABB5CB7004A8C5A /* RZClothEffect.m */,
 				8A50A2B21ABB5CB7004A8C5A /* RZCompositeEffect.h */,
 				8A50A2B31ABB5CB7004A8C5A /* RZCompositeEffect.m */,
+				8A04F0561AE18099006E145B /* RZXBasicModelEffect.h */,
+				8A04F0571AE18099006E145B /* RZXBasicModelEffect.m */,
 			);
 			path = Effects;
 			sourceTree = "<group>";
@@ -254,6 +267,21 @@
 				8A65580B1ABC554C00E59FDC /* RZXVertexObjectData.m */,
 			);
 			name = Mesh;
+			sourceTree = "<group>";
+		};
+		8A9E515B1AE061C700C7C656 /* Node */ = {
+			isa = PBXGroup;
+			children = (
+				8A04F0481AE157F1006E145B /* RZXNode.h */,
+				8A04F0491AE157F1006E145B /* RZXNode.m */,
+				8A04F04C1AE15BE4006E145B /* RZXScene.h */,
+				8A04F04D1AE15BE4006E145B /* RZXScene.m */,
+				8A04F0501AE15C9D006E145B /* RZXSceneView.h */,
+				8A04F0511AE15C9D006E145B /* RZXSceneView.m */,
+				8A04F0531AE15CD6006E145B /* RZXModel.h */,
+				8A04F0541AE15CD6006E145B /* RZXModel.m */,
+			);
+			name = Node;
 			sourceTree = "<group>";
 		};
 		8AA7E3441ABF6E720095C6D3 /* Resources */ = {
@@ -370,18 +398,22 @@
 				8A50A2C21ABB5CB7004A8C5A /* RZCompositeEffect.m in Sources */,
 				8A50A2BB1ABB5CB7004A8C5A /* RZEffectContext.m in Sources */,
 				8A50A2BE1ABB5CB7004A8C5A /* RZRenderLoop.m in Sources */,
+				8A04F0551AE15CD6006E145B /* RZXModel.m in Sources */,
 				8A50A2BA1ABB5CB7004A8C5A /* RZEffect.m in Sources */,
 				8A50A27B1ABB5CA1004A8C5A /* ViewController.m in Sources */,
 				8A50A2CB1ABB5E6F004A8C5A /* RZXMesh.m in Sources */,
+				8A04F0521AE15C9D006E145B /* RZXSceneView.m in Sources */,
+				8A04F0581AE18099006E145B /* RZXBasicModelEffect.m in Sources */,
 				8A50A2C31ABB5CB7004A8C5A /* RZUIEffectView.m in Sources */,
 				8A50A2BD1ABB5CB7004A8C5A /* RZQuadMesh.m in Sources */,
-				8A08585D1AC4971200F04BB8 /* RZXNode.m in Sources */,
+				8A04F04E1AE15BE4006E145B /* RZXScene.m in Sources */,
 				8A50A2C11ABB5CB7004A8C5A /* RZClothEffect.m in Sources */,
 				8A50A2BF1ABB5CB7004A8C5A /* RZTransform3D.m in Sources */,
 				8A50A2781ABB5CA1004A8C5A /* AppDelegate.m in Sources */,
 				8A50A2C01ABB5CB7004A8C5A /* RZBlurEffect.m in Sources */,
 				8A65580C1ABC554C00E59FDC /* RZXVertexObjectData.m in Sources */,
 				8A50A2BC1ABB5CB7004A8C5A /* RZGLView.m in Sources */,
+				8A04F04A1AE157F1006E145B /* RZXNode.m in Sources */,
 				8A50A2C41ABB5CB7004A8C5A /* RZViewTexture.m in Sources */,
 				8A50A2B91ABB5CB7004A8C5A /* RZCamera.m in Sources */,
 				8A50A2751ABB5CA1004A8C5A /* main.m in Sources */,

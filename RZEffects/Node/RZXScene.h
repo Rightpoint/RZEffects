@@ -1,13 +1,13 @@
 //
-//  RZXNode.m
+//  RZXScene.h
 //  RZXSceneDemo
 //
-//  Created by John Stricker on 3/26/15.
+//  Created by John Stricker on 4/17/15.
 //  Copyright (c) 2015 Raizlabs. All rights reserved.
 //
 
 #import "RZXNode.h"
 
-@implementation RZXNode
+@interface RZXScene : RZXNode
 
 @end
